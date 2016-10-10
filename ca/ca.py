@@ -20,10 +20,10 @@ class CA:
 
 
 
-    def run_simulation(self, number_of_generations, rule_number):
+    def run_simulation(self, initial_generation, number_of_generations, rule_number):
         rule = Rule(rule_number)
         all_generations = []
-        initial_generation = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
         all_generations.append(initial_generation)
         current_generation = initial_generation
         for i in range(number_of_generations):
@@ -62,6 +62,11 @@ class Rule:
         self.number = number
 
     def getRuleScheme(self, rule_number):
+        """
+        TODO: have external bank of all the rules. not hardcoded
+        :param rule_number:
+        :return:
+        """
         rule_110 = {
             (1,1,1):0,
             (1,1,0):1,
