@@ -29,6 +29,11 @@ class CA:
         for i in range(number_of_generations):
             current_generation = self.run_simulation_step(current_generation, rule)
             all_generations.append(current_generation)
+
+        return all_generations
+
+
+    def show_console_printout(self, all_generations):
         for gen in all_generations:
             genstring = ""
             for ind in gen:
@@ -37,9 +42,6 @@ class CA:
                 else:
                     genstring += " "
             print(genstring)
-
-        #pprint.pprint(all_generations)
-
 
 
 
@@ -85,7 +87,7 @@ class Rule:
         if len(input_array) != 3:
             raise ValueError
         if self.number == 110:
-            print("Number:" + str(self.number))
+            #print("Number:" + str(self.number))
             scheme = self.getRuleScheme(110)
             output = scheme[(input_array[0], input_array[1], input_array[2])]
 
