@@ -10,9 +10,9 @@ gui-package: Tentative GUI-package which is proposed used to visualize the compu
 tests-package: Tentative package for testing the various parts of the system. e.g. the rules of the CA.
 
 """
-import sys
-import reservoir.ca as ca
-import classifier.skl_svm as svmclf
+#import sys
+#import reservoir.ca as ca
+#import classifier.skl_svm as svmclf
 import random
 from rc_ca_project import project as project
 
@@ -21,8 +21,8 @@ __author__ = 'magnus'
 
 def main():
     p = project.Project()
-    p.execute_test1()
-    #p.execute_majority_task()
+    #p.execute_test1()
+    p.execute_majority_task()
 
 
 if __name__ == "__main__":

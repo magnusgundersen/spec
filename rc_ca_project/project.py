@@ -17,15 +17,17 @@ class Project:
         pass
 
     def execute_majority_task(self):
-        raise NotImplementedError()
+        rcca_system = rcca.RCCASystem()
+        rcca_system.use_elem_ca(110)
+        easy_majority_data = self.open_data("majority_easy.txt")
+
+        rcca_system.train_system(easy_majority_data)
+
+
+        #raise NotImplementedError()
+    """
 
     def execute_test1(self):
-        rcca_system = rcca.RCCASystem() # Init a system that has elementary CA as reservoir and SVM as clf
-        rcca_system.use_elem_ca(110)
-        test_data =
-
-        rcca_system.
-
 
         ## IF initial
         init_gen_size = 10000
@@ -49,8 +51,16 @@ class Project:
 
         svm.predict([random.randint(0,1) for _ in range(size_of_list)])
 
-#runCA()
-
+"""
+    def open_data(self, filename):
+        dataset = []
+        with open("../data/"+filename, "r") as f:
+            content = f.readlines()
+            for line in content:
+                _input, _output = line.split(" ")
+                dataset.append((_input,_output))
+        return dataset
+"""
 
 def runRC():
     rc_system = rc.ReservoirSystem()
@@ -58,8 +68,7 @@ def runRC():
     rc_system.train_system()
 
 
-runRC()
-        pass
+"""
 
 
 
