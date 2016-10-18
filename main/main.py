@@ -2,19 +2,19 @@
 Main-file for executing the CA-RC framework written by Magnus Gundersen
 
 System consists of:
-ca-package: Contains a cellular automata simulator.
+reservoir-package: Contains a cellular automata simulator.
 classifier-package: Contains various implementations of a classifier. Is used for the readout-layer of the RC-system
-rc-package: Contains the reservoir computation framework in which the CA may be used as a reservoir
+reservoircomputing-package: Contains the reservoir computation framework in which the CA may be used as a reservoir
 
 gui-package: Tentative GUI-package which is proposed used to visualize the computations
 tests-package: Tentative package for testing the various parts of the system. e.g. the rules of the CA.
 
 """
-import ca.ca as ca
+import reservoir.ca as ca
 import classifier.skl_svm as svmclf
 import random
 
-import rc.rc as rc
+import reservoircomputing.rc as rc
 __author__ = 'magnus'
 
 
@@ -48,7 +48,7 @@ def runCA():
 
 def runRC():
     rc_system = rc.ReservoirSystem()
-    rc_system.initialize_system('ca','sklearn_svm')
+    rc_system.initialize_system('reservoir','sklearn_svm')
     rc_system.train_system()
 
 
