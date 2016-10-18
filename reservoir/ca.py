@@ -1,9 +1,16 @@
 __author__ = 'magnus'
 import pprint
 
-class CA:
+class ElemCAReservoir:
     def __init__(self):
-        pass
+        self.available_rules = [110]  # only 110
+        self.current_rule = None
+
+    def set_rule(self, rule_number):
+        if rule_number in self.available_rules:
+            self.current_rule = Rule(rule_number)
+        else:
+            raise ValueError("Rule: " + str(rule_number) + " is not implemented!")
 
     def run_simulation_step(self, prev_generation, rule):
         length = len(prev_generation)
@@ -20,16 +27,13 @@ class CA:
 
 
 
-    def run_simulation(self, initial_generation, number_of_generations, rule_number):
-        rule = Rule(rule_number)
+    def run_simulation(self, initial_generation, number_of_generations):
         all_generations = []
-
         all_generations.append(initial_generation)
         current_generation = initial_generation
         for i in range(number_of_generations):
-            current_generation = self.run_simulation_step(current_generation, rule)
+            current_generation = self.run_simulation_step(current_generation, self.current_rule)
             all_generations.append(current_generation)
-
         return all_generations
 
 

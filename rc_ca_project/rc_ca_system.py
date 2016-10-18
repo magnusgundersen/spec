@@ -6,6 +6,7 @@ classifiers as chosen.
 """
 __author__ = 'magnus'
 import classifier.skl_svm as svm
+from reservoir import ca as ca
 
 
 class RCCASystem:
@@ -16,9 +17,19 @@ class RCCASystem:
     etc...
     """
     def __init__(self):
-        self.classification_alternatives = ['sklearn_ann', 'sklearn_svm', 'tflearn_ann']
-        self.reservoir_alternatives = ['reservoir']
+        self.classification_alternatives = ['sklearn_svm']
+        self.reservoir_alternatives = ['elem_ca']
         self.rc_framework = None
+
+        self.reservoir = None
+        self.classifier = None
+
+    def use_elem_ca(self, rule_number):
+        """
+        """
+        self.reservoir = ca.ElemCAReservoir()
+        self.reservoir.set_rule(110)
+
 
     def initialize_system(self, reservoir_chosen, classification_chosen):
         if reservoir_chosen not in self.reservoir_alternatives \
