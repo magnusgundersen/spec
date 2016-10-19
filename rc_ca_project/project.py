@@ -19,9 +19,29 @@ class Project:
     def execute_majority_task(self):
         rcca_system = rcca.RCCASystem()
         rcca_system.use_elem_ca(110)
-        easy_majority_data = self.open_data("majority_easy.txt")
-
+        rcca_system.use_svm()
+        easy_majority_data = self.open_data("majority_hard.txt")
+        easy_majority_data = self.convert_to_array(easy_majority_data)
+        # use ten percent as test data
+        size_of_data = len(easy_majority_data)
+        test_set_pointer = int(size_of_data*0.1)
+        test_set = easy_majority_data[:test_set_pointer]
+        easy_majority_data = easy_majority_data[test_set_pointer:]
         rcca_system.train_system(easy_majority_data)
+
+        self.test_majority_task(test_set, rcca_system)
+
+    def test_majority_task(self, test_set, rcca_system):
+        number_of_correct = 0
+        for _input, _output in test_set:
+            predicted = rcca_system.predict(_input)
+
+            #print("Predicted: " + str(predicted))
+            #print("Correct: " + str(_output))
+            if predicted == _output:
+                number_of_correct += 1
+        print("correct:" + str(number_of_correct) + " of " + str(len(test_set)))
+
 
 
         #raise NotImplementedError()
@@ -52,13 +72,20 @@ class Project:
         svm.predict([random.randint(0,1) for _ in range(size_of_list)])
 
 """
+    def convert_to_array(self, training_set):
+        new_training_set = []
+        for _input,_output in training_set:
+            new_training_set.append(([int(number) for number in _input],_output))
+
+        return new_training_set
+
     def open_data(self, filename):
         dataset = []
         with open("../data/"+filename, "r") as f:
             content = f.readlines()
             for line in content:
                 _input, _output = line.split(" ")
-                dataset.append((_input,_output))
+                dataset.append((_input,_output[0]))
         return dataset
 """
 
