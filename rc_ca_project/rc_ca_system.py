@@ -38,41 +38,15 @@ class RCCASystem:
         self.rc_framework.reservoir = self.reservoir
 
 
-    def initialize_system(self, reservoir_chosen, classification_chosen):
-        if reservoir_chosen not in self.reservoir_alternatives \
-                or classification_chosen not in self.classification_alternatives:
-            raise ValueError("Illegal reservoir or classification")
-
-        #self.rc_framework = ReservoirComputingFramework()
-
-        if reservoir_chosen == "reservoir":
-            reservoir = ca.CA()
-            self.rc_framework.reservoir = reservoir
-
-        if classification_chosen == "sklearn_svm":
-            classification = svm.SVM()
-            self.rc_framework.classifier = classification
-
-
-
     def train_system(self, training_set):
         """
         pairs of training-vector and correct classifiers
 
         """
         classifier_training_set = []
+
+
         self.rc_framework.fit_to_training_set(training_set)
-
-
-        """
-        for training_input, training_correct in training_set:
-            # Propagates through the reservoir
-            reservoir_output = self.rc_framework.propagate_in_reservoir(training_input)
-            classifier_training_set.append((reservoir_output, training_correct))
-
-
-        """
-        pass
 
 
     def predict(self, _input):

@@ -17,17 +17,25 @@ class Project:
         pass
 
     def execute_majority_task(self):
+        # Parameters
+        ca_rule = 110
+        fraction_use_for_test = 0.1
+        data_set_number = "mix"
+
         rcca_system = rcca.RCCASystem()
-        rcca_system.use_elem_ca(110)
+        rcca_system.use_elem_ca(ca_rule)
         rcca_system.use_svm()
-        easy_majority_data = self.open_data("majority_hard.txt")
-        easy_majority_data = self.convert_to_array(easy_majority_data)
+
+        majority_data = self.open_data("majority/"+data_set_number)
+        majority_data = self.convert_to_array(majority_data)
+
         # use ten percent as test data
-        size_of_data = len(easy_majority_data)
-        test_set_pointer = int(size_of_data*0.1)
-        test_set = easy_majority_data[:test_set_pointer]
-        easy_majority_data = easy_majority_data[test_set_pointer:]
-        rcca_system.train_system(easy_majority_data)
+        size_of_data = len(majority_data)
+        test_set_pointer = int(size_of_data*fraction_use_for_test)
+        test_set = majority_data[:test_set_pointer]
+        majority_data = majority_data[test_set_pointer:]
+
+        rcca_system.train_system(majority_data)
 
         self.test_majority_task(test_set, rcca_system)
 
@@ -38,48 +46,31 @@ class Project:
 
             #print("Predicted: " + str(predicted))
             #print("Correct: " + str(_output))
-            if predicted == _output:
+            if predicted>0.55 and _output == 1:
+                number_of_correct += 1
+            elif predicted<0.55 and _output == 0:
                 number_of_correct += 1
         print("correct:" + str(number_of_correct) + " of " + str(len(test_set)))
 
-
-
-        #raise NotImplementedError()
-    """
-
-    def execute_test1(self):
-
-        ## IF initial
-        init_gen_size = 10000
-        initial_generation = []
-        for i in range(init_gen_size):
-            initial_generation.append(0)
-        initial_generation[50] = 1
-
-        number_of_generations = 100
-        ca_rule = 110
-
-        all_generations = testCA.run_simulation(initial_generation,number_of_generations,ca_rule)
-
-        flat_ca_list = [ca_val for sublist in all_generations for ca_val in sublist]
-        size_of_list = len(flat_ca_list)
-        dummy_training = [flat_ca_list for _ in range(100)]
-        dummy_correct = [random.randint(0,1) for _ in range(100)]
-        print(len(dummy_training))
-        svm = svmclf.SVM()
-        svm.fit(dummy_training,dummy_correct)
-
-        svm.predict([random.randint(0,1) for _ in range(size_of_list)])
-
-"""
     def convert_to_array(self, training_set):
         new_training_set = []
         for _input,_output in training_set:
-            new_training_set.append(([int(number) for number in _input],_output))
+            new_training_set.append(([int(number) for number in _input],int(_output)))
 
         return new_training_set
 
     def open_data(self, filename):
+        """
+        Reads data from file
+
+        data must be on the form of
+
+        1010010101...100101 0
+
+        Where the first vector is binary, and the last integer is the class. Must also be binary.
+        :param filename:
+        :return:
+        """
         dataset = []
         with open("../data/"+filename, "r") as f:
             content = f.readlines()
@@ -87,15 +78,8 @@ class Project:
                 _input, _output = line.split(" ")
                 dataset.append((_input,_output[0]))
         return dataset
-"""
-
-def runRC():
-    rc_system = rc.ReservoirSystem()
-    rc_system.initialize_system('reservoir','sklearn_svm')
-    rc_system.train_system()
 
 
-"""
 
 
 

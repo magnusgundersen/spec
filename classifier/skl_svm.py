@@ -1,5 +1,6 @@
 __author__ = 'magnus'
 from sklearn import svm as svm
+from sklearn import linear_model as linmod
 from reservoircomputing import rc_interface as interfaces
 
 
@@ -7,8 +8,11 @@ class SVM(interfaces.RCClassifier):
     def __init__(self):
         super(SVM, self).__init__()
         self.svm = svm.SVC()
+        self.svm = linmod.LinearRegression()
 
     def fit(self, training_input, correct_predictions):
+        #print("[SVM] " + str(training_input[:100]))
+        #print("[SVM] " + str(correct_predictions[:100]))
         return self.svm.fit(training_input, correct_predictions)
 
     def predict(self, reservoir_outputs):

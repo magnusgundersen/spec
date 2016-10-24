@@ -3,14 +3,10 @@ import pprint
 
 class ElemCAReservoir:
     def __init__(self):
-        self.available_rules = [110]  # only 110
         self.current_rule = None
 
     def set_rule(self, rule_number):
-        if rule_number in self.available_rules:
-            self.current_rule = Rule(rule_number)
-        else:
-            raise ValueError("Rule: " + str(rule_number) + " is not implemented!")
+        self.current_rule = Rule(rule_number)
 
     def run_simulation_step(self, prev_generation, rule):
         length = len(prev_generation)
@@ -27,14 +23,15 @@ class ElemCAReservoir:
 
 
 
-    def run_simulation(self, initial_generation, number_of_generations):
+    def run_simulation(self, initial_inputs, number_of_generations):
         all_generations = []
-        all_generations.append(initial_generation)
-        current_generation = initial_generation
+        number_of_input_vectors = len(initial_inputs)
+        all_generations.append(initial_inputs.pop(0))
+        current_generation = all_generations[0]
         for i in range(number_of_generations):
             current_generation = self.run_simulation_step(current_generation, self.current_rule)
             all_generations.append(current_generation)
-        return all_generations
+        return all_generations # TODO: consider if this is a good idea
 
 
     def show_console_printout(self, all_generations):
@@ -69,31 +66,32 @@ class Rule:
 
     def getRuleScheme(self, rule_number):
         """
-        TODO: have external bank of all the rules. not hardcoded
         :param rule_number:
         :return:
         """
-        rule_110 = {
-            (1,1,1):0,
-            (1,1,0):1,
-            (1,0,1):1,
-            (1,0,0):1,
-            (0,1,1):1,
-            (0,1,0):1,
-            (0,0,1):0,
-            (0,0,0):0
+        binrule = bin(rule_number)
+        binrule = format(rule_number,"08b")
+
+        rule = {
+            (1,1,1): int(binrule[0]),
+            (1,1,0): int(binrule[1]),
+            (1,0,1): int(binrule[2]),
+            (1,0,0): int(binrule[3]),
+            (0,1,1): int(binrule[4]),
+            (0,1,0): int(binrule[5]),
+            (0,0,1): int(binrule[6]),
+            (0,0,0): int(binrule[7])
         }
-        if rule_number == 110:
-            return rule_110
+
+        return rule
 
     def getOutput(self, input_array):
         output = 0
         if len(input_array) != 3:
             raise ValueError
-        if self.number == 110:
-            #print("Number:" + str(self.number))
-            scheme = self.getRuleScheme(110)
-            output = scheme[(input_array[0], input_array[1], input_array[2])]
+
+        scheme = self.getRuleScheme(self.number)
+        output = scheme[(input_array[0], input_array[1], input_array[2])]
 
         return output
 
