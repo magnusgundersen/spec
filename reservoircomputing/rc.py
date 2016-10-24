@@ -41,12 +41,13 @@ class ReservoirComputingFramework:
     def classifier(self, classifier):
         self._classifier = classifier
 
+
     def fit_to_training_set(self, training_set):
         """
         must split the training set in what to feed the reservoir and what to fit the classifier to
         :return:
         """
-        number_of_generations = 5
+        number_of_generations = 32
 
         reservoir_outputs = []
         classifier_outputs = []
@@ -55,20 +56,17 @@ class ReservoirComputingFramework:
             #print("running one traning-set")
             #print("Input:" + str(_input))
             #print("Output:" + str(_output))
-            reservoir_output = self.reservoir.run_simulation(_input, number_of_generations)
-            reservoir_output = [ca_val for sublist in reservoir_output for ca_val in sublist]
+            reservoir_output = self.reservoir.run_simulation([_input], number_of_generations)
+            reservoir_output = [ca_val for sublist in reservoir_output for ca_val in sublist]  # flatten
             reservoir_outputs.append(reservoir_output)
             classifier_outputs.append(_output)
 
-        print("finished training")
-        print("Size of training.set:" + str(len(training_set)))
-        print('Size of reservoir outputs: '+ str(len(reservoir_outputs)))
-        print('Size of classifier outputs: '+ str(len(classifier_outputs)))
-
+        print("Finished propagating")
         self.classifier.fit(reservoir_outputs,classifier_outputs)
+        print("finished fitting the classifier")
 
     def predict(self, _input):
-        reservoir_output = self.reservoir.run_simulation(_input, 5)
+        reservoir_output = self.reservoir.run_simulation([_input], 32)
         reservoir_output = [ca_val for sublist in reservoir_output for ca_val in sublist]
         return self.classifier.predict(np.array(reservoir_output).reshape(-1, len(reservoir_output)))
 

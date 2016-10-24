@@ -34,7 +34,7 @@ class RCCASystem:
         """
         """
         self.reservoir = ca.ElemCAReservoir()
-        self.reservoir.set_rule(110)
+        self.reservoir.set_rule(rule_number)
         self.rc_framework.reservoir = self.reservoir
 
 

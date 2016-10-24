@@ -18,7 +18,7 @@ class Project:
 
     def execute_majority_task(self):
         # Parameters
-        ca_rule = 110
+        ca_rule = 105
         fraction_use_for_test = 0.1
         data_set_number = "mix"
 
