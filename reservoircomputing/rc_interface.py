@@ -25,3 +25,19 @@ class RCReservoir:
     """
     def __init__(self):
         pass
+
+class RCEncoder:
+    """
+
+    """
+    def __init__(self):
+        pass
+
+    def encode(self, _input):
+        """
+        Encode the input in whatever way.
+
+        _input is an array,
+        :param _input:
+        :return:
+        """

@@ -18,6 +18,7 @@ class ReservoirComputingFramework:
     def __init__(self):
         self._reservoir = None
         self._classifier = None
+        self._encoder = None
 
     @property
     def reservoir(self):
@@ -41,6 +42,14 @@ class ReservoirComputingFramework:
     def classifier(self, classifier):
         self._classifier = classifier
 
+    @property
+    def encoder(self):
+        return self._encoder
+
+    @encoder.setter
+    def encoder(self, encoder):
+        self._encoder = encoder
+
 
     def fit_to_training_set(self, training_set):
         """
@@ -53,9 +62,10 @@ class ReservoirComputingFramework:
         classifier_outputs = []
 
         for _input, _output in training_set:
-            #print("running one traning-set")
-            #print("Input:" + str(_input))
-            #print("Output:" + str(_output))
+            # TODO: Consider how to feed temporal sequences to the reservoir, ie. [_input1, _input2, ...]
+
+            _input = self.encoder.encode(_input)
+
             reservoir_output = self.reservoir.run_simulation([_input], number_of_generations)
             reservoir_output = [ca_val for sublist in reservoir_output for ca_val in sublist]  # flatten
             reservoir_outputs.append(reservoir_output)
@@ -71,6 +81,5 @@ class ReservoirComputingFramework:
         return self.classifier.predict(np.array(reservoir_output).reshape(-1, len(reservoir_output)))
 
     def propagate_in_reservoir(self, input_array):
-        number_of_generations = 100
-
         return self.reservoir.run_simulation(input_array)
+

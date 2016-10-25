@@ -8,6 +8,7 @@ __author__ = 'magnus'
 from classifier import skl_svm as svm
 from reservoir import ca as ca
 from reservoircomputing import rc as rc
+from encoder import rnd_mapping as rnd_map
 
 
 class RCCASystem:
@@ -22,6 +23,7 @@ class RCCASystem:
         self.reservoir = None  # ca.ElemCAReservoir()
         #self.reservoir.set_rule(ca_rule)
         self.classifier = None  # svm.SVM()
+        self.encoder = None
         self.rc_framework = rc.ReservoirComputingFramework()
         #self.rc_framework.reservoir = self.reservoir
         #self.rc_framework.classifier = self.classifier
@@ -36,6 +38,12 @@ class RCCASystem:
         self.reservoir = ca.ElemCAReservoir()
         self.reservoir.set_rule(rule_number)
         self.rc_framework.reservoir = self.reservoir
+
+    def use_random_mapping(self, r=1):
+        self.encoder = rnd_map.RandomMappingEncoder()
+        self.encoder.R = r
+        self.rc_framework.encoder = self.encoder
+
 
 
     def train_system(self, training_set):

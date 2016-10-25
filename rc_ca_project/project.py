@@ -25,6 +25,7 @@ class Project:
         rcca_system = rcca.RCCASystem()
         rcca_system.use_elem_ca(ca_rule)
         rcca_system.use_svm()
+        rcca_system.use_random_mapping(1)
 
         majority_data = self.open_data("majority/"+data_set_number)
         majority_data = self.convert_to_array(majority_data)
