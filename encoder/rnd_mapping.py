@@ -18,4 +18,5 @@ class RandomMappingEncoder(rcif.RCEncoder):
             r_list = _input[:]
             random.shuffle(r_list)
             new_input.extend(r_list)  # Flatten
+
         return new_input

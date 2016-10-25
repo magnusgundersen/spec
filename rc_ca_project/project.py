@@ -17,7 +17,7 @@ class Project:
     def __init__(self):
         pass
 
-    def execute_majority_task(self, ca_rule=250, R=2, I=32, data_set_name="8_bit_mix_5000"):
+    def execute_majority_task(self, ca_rule=88, R=4, I=32, data_set_name="8_bit_mix_1000"):
         # Parameters
         fraction_use_for_test = 0.1
 
