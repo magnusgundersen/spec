@@ -22,7 +22,9 @@ __author__ = 'magnus'
 def main():
     p = project.Project()
     #p.execute_test1()
-    p.execute_majority_task()
+
+
+    print(p.execute_majority_task())
 
 
 if __name__ == "__main__":

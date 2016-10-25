@@ -44,6 +44,10 @@ class RCCASystem:
         self.encoder.R = r
         self.rc_framework.encoder = self.encoder
 
+    def use_uniform_iterations(self, I):
+        self.iterations = I
+
+
 
 
     def train_system(self, training_set):
@@ -52,13 +56,13 @@ class RCCASystem:
 
         """
         classifier_training_set = []
-
-
-        self.rc_framework.fit_to_training_set(training_set)
+        self.rc_framework.fit_to_training_set(training_set, self.iterations)
 
 
     def predict(self, _input):
-        return self.rc_framework.predict(_input)
+        return self.rc_framework.predict(_input, self.iterations)
 
+    def run_example_simulation(self, _input):
+        return self.rc_framework.run_example_simulation(_input)
 
 

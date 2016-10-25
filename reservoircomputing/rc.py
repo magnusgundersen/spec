@@ -51,12 +51,12 @@ class ReservoirComputingFramework:
         self._encoder = encoder
 
 
-    def fit_to_training_set(self, training_set):
+    def fit_to_training_set(self, training_set, iterations):
         """
         must split the training set in what to feed the reservoir and what to fit the classifier to
         :return:
         """
-        number_of_generations = 4
+        number_of_generations = iterations
 
         reservoir_outputs = []
         classifier_outputs = []
@@ -73,15 +73,18 @@ class ReservoirComputingFramework:
 
         print("Finished propagating")
         self.classifier.fit(reservoir_outputs,classifier_outputs)
-        print("finished fitting the classifier")
+        print("Finished fitting the classifier")
 
-    def predict(self, _input):
+    def predict(self, _input, iterations):
         _input = self.encoder.encode(_input)
-        reservoir_output = self.reservoir.run_simulation([_input], 4)
+        reservoir_output = self.reservoir.run_simulation([_input], iterations)
 
         reservoir_output = [ca_val for sublist in reservoir_output for ca_val in sublist]
         return self.classifier.predict(np.array(reservoir_output).reshape(-1, len(reservoir_output)))
 
-    def propagate_in_reservoir(self, input_array):
-        return self.reservoir.run_simulation(input_array)
+
+    def run_example_simulation(self, _input):
+        reservoir_output = self.reservoir.run_simulation([_input], 4)
+        return reservoir_output
+
 

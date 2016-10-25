@@ -4,7 +4,8 @@ Project specific functionality
 """
 __author__ = 'magnus'
 from rc_ca_project import rc_ca_system as rcca
-
+from gui import ca_basic_visualizer as bviz
+import random
 class Project:
     """
     Contains all tasks and functionality specifically to the specialization project.
@@ -16,19 +17,17 @@ class Project:
     def __init__(self):
         pass
 
-    def execute_majority_task(self):
+    def execute_majority_task(self, ca_rule=250, R=2, I=32, data_set_name="8_bit_mix_5000"):
         # Parameters
-        ca_rule = 150
-        R = 4
         fraction_use_for_test = 0.1
-        data_set_number = "mix"
 
         rcca_system = rcca.RCCASystem()
         rcca_system.use_elem_ca(ca_rule)
         rcca_system.use_svm()
         rcca_system.use_random_mapping(R)
+        rcca_system.use_uniform_iterations(I)
 
-        majority_data = self.open_data("majority/"+data_set_number)
+        majority_data = self.open_data("majority/"+data_set_name)
         majority_data = self.convert_to_array(majority_data)
 
         # use ten percent as test data
@@ -39,7 +38,17 @@ class Project:
 
         rcca_system.train_system(majority_data)
 
-        self.test_majority_task(test_set, rcca_system)
+        test_score = self.test_majority_task(test_set, rcca_system)
+        visualize_rule = True
+
+        if visualize_rule:
+            vis = bviz.CAVisualizer()
+            vis.rule_vizualize(ca_rule, R, I, majority_data[random.randint(0,100)][0])
+        return {"dataset": data_set_name,
+                "ca_rule": ca_rule,
+                "R": R,
+                "I": I,
+                "correct": test_score}
 
     def test_majority_task(self, test_set, rcca_system):
         number_of_correct = 0
@@ -53,6 +62,17 @@ class Project:
             elif predicted<0.55 and _output == 0:
                 number_of_correct += 1
         print("correct:" + str(number_of_correct) + " of " + str(len(test_set)))
+
+        run_vis = False  # DOES NOT WORK
+        if run_vis:
+            visable = rcca_system.run_example_simulation(test_set[-1])
+            self.visualise_example(visable)
+
+        return (number_of_correct / len(test_set)) * 100
+
+    def visualise_example(self, training_array):
+        visualizer = bviz.CAVisualizer()
+        visualizer.visualize(training_array)
 
     def convert_to_array(self, training_set):
         new_training_set = []

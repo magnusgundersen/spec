@@ -11,6 +11,7 @@ class ElemCAReservoir:
     def run_simulation_step(self, prev_generation, rule):
         length = len(prev_generation)
         next_generation = []
+
         #Wrap around
         for i in range(length):
             left_index = (i-1) % length
@@ -18,7 +19,6 @@ class ElemCAReservoir:
             right_index = (i+1) % length
             next_generation.append(rule.getOutput([prev_generation[left_index],
                                                   prev_generation[mid_index], prev_generation[right_index]]))
-
         return next_generation
 
 
@@ -31,7 +31,7 @@ class ElemCAReservoir:
         for i in range(number_of_generations):
             current_generation = self.run_simulation_step(current_generation, self.current_rule)
             all_generations.append(current_generation)
-        return all_generations[1:]  # TODO: consider if this is a good idea
+        return all_generations[1:]
 
 
     def show_console_printout(self, all_generations):

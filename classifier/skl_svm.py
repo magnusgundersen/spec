@@ -8,7 +8,7 @@ class SVM(interfaces.RCClassifier):
     def __init__(self):
         super(SVM, self).__init__()
         self.svm = svm.SVC(kernel="linear")
-        self.svm = ridge.Ridge()
+        #self.svm = ridge.Ridge()
 
     def fit(self, training_input, correct_predictions):
         #print("[SVM] " + str(training_input[:100]))
