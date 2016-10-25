@@ -18,14 +18,15 @@ class Project:
 
     def execute_majority_task(self):
         # Parameters
-        ca_rule = 105
+        ca_rule = 150
+        R = 4
         fraction_use_for_test = 0.1
         data_set_number = "mix"
 
         rcca_system = rcca.RCCASystem()
         rcca_system.use_elem_ca(ca_rule)
         rcca_system.use_svm()
-        rcca_system.use_random_mapping(1)
+        rcca_system.use_random_mapping(R)
 
         majority_data = self.open_data("majority/"+data_set_number)
         majority_data = self.convert_to_array(majority_data)

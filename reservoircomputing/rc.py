@@ -56,7 +56,7 @@ class ReservoirComputingFramework:
         must split the training set in what to feed the reservoir and what to fit the classifier to
         :return:
         """
-        number_of_generations = 32
+        number_of_generations = 4
 
         reservoir_outputs = []
         classifier_outputs = []
@@ -76,7 +76,9 @@ class ReservoirComputingFramework:
         print("finished fitting the classifier")
 
     def predict(self, _input):
-        reservoir_output = self.reservoir.run_simulation([_input], 32)
+        _input = self.encoder.encode(_input)
+        reservoir_output = self.reservoir.run_simulation([_input], 4)
+
         reservoir_output = [ca_val for sublist in reservoir_output for ca_val in sublist]
         return self.classifier.predict(np.array(reservoir_output).reshape(-1, len(reservoir_output)))
 

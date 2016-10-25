@@ -49,6 +49,6 @@ def generate_majority_file(filename, vector_size, number_of_vectors, difficulty)
         f.write(content)
 
 
-generate_majority_file('mix',25,1000,2)
+generate_majority_file('mix',10,10000,2)
 
 

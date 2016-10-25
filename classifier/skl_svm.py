@@ -1,6 +1,6 @@
 __author__ = 'magnus'
 from sklearn import svm as svm
-from sklearn import linear_model as linmod
+from sklearn.linear_model import ridge as ridge
 from reservoircomputing import rc_interface as interfaces
 
 
@@ -8,7 +8,7 @@ class SVM(interfaces.RCClassifier):
     def __init__(self):
         super(SVM, self).__init__()
         self.svm = svm.SVC(kernel="linear")
-        #self.svm = linmod.LinearRegression()
+        self.svm = ridge.Ridge()
 
     def fit(self, training_input, correct_predictions):
         #print("[SVM] " + str(training_input[:100]))

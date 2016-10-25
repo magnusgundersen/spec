@@ -4,15 +4,15 @@ import matplotlib.pyplot as plt
 import random
 
 def CATests():
-    width = 100
-    gens = 100
+    width = 10
+    gens = 12
     input_one = [0 for x in range(width)]
     input_one[width//2] = 1
     list_of_nums = [0,1]
     input_one = [random.choice(list_of_nums) for x in range(width)]
     input_one = [input_one]
     elem_ca = ca.ElemCAReservoir()
-    elem_ca.set_rule(154)
+    elem_ca.set_rule(105)
 
     output = elem_ca.run_simulation(input_one,gens)
     output = output[::-1]
