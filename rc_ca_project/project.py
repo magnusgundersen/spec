@@ -6,6 +6,8 @@ __author__ = 'magnus'
 from rc_ca_project import rc_ca_system as rcca
 from gui import ca_basic_visualizer as bviz
 import random
+import pprint
+
 class Project:
     """
     Contains all tasks and functionality specifically to the specialization project.
@@ -17,7 +19,7 @@ class Project:
     def __init__(self):
         pass
 
-    def execute_majority_task(self, ca_rule=88, R=4, I=32, data_set_name="8_bit_mix_1000"):
+    def execute_majority_task(self, ca_rule=88, R=4, I=10, data_set_name="8_bit_mix_1000"):
         # Parameters
         fraction_use_for_test = 0.1
 
@@ -43,7 +45,9 @@ class Project:
 
         if visualize_rule:
             vis = bviz.CAVisualizer()
-            vis.rule_vizualize(ca_rule, R, I, majority_data[random.randint(0,100)][0])
+            ex_run = rcca_system.run_example_simulation(majority_data[random.randint(0,100)][0], I)
+            vis.visualize(ex_run)
+            #vis.rule_vizualize(ca_rule, R, I, majority_data[random.randint(0,100)][0])
         return {"dataset": data_set_name,
                 "ca_rule": ca_rule,
                 "R": R,

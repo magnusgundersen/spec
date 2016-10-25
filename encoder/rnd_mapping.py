@@ -16,6 +16,7 @@ class RandomMappingEncoder(rcif.RCEncoder):
         new_input = _input[:]
         for _ in range(self.R):
             r_list = _input[:]
+            #r_list = [0,0,0,0,0,0,0,0,0,0,0,0]
             random.shuffle(r_list)
             new_input.extend(r_list)  # Flatten
 

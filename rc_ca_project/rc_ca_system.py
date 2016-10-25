@@ -39,7 +39,7 @@ class RCCASystem:
         self.reservoir.set_rule(rule_number)
         self.rc_framework.reservoir = self.reservoir
 
-    def use_random_mapping(self, r=1):
+    def use_random_mapping(self, r):
         self.encoder = rnd_map.RandomMappingEncoder()
         self.encoder.R = r
         self.rc_framework.encoder = self.encoder
@@ -62,7 +62,7 @@ class RCCASystem:
     def predict(self, _input):
         return self.rc_framework.predict(_input, self.iterations)
 
-    def run_example_simulation(self, _input):
-        return self.rc_framework.run_example_simulation(_input)
+    def run_example_simulation(self, _input, iterations):
+        return self.rc_framework.run_example_simulation(_input, iterations)
 
 

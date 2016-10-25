@@ -65,7 +65,6 @@ class ReservoirComputingFramework:
             # TODO: Consider how to feed temporal sequences to the reservoir, ie. [_input1, _input2, ...]
 
             _input = self.encoder.encode(_input)
-
             reservoir_output = self.reservoir.run_simulation([_input], number_of_generations)
             reservoir_output = [ca_val for sublist in reservoir_output for ca_val in sublist]  # flatten
             reservoir_outputs.append(reservoir_output)
@@ -83,8 +82,9 @@ class ReservoirComputingFramework:
         return self.classifier.predict(np.array(reservoir_output).reshape(-1, len(reservoir_output)))
 
 
-    def run_example_simulation(self, _input):
-        reservoir_output = self.reservoir.run_simulation([_input], 4)
+    def run_example_simulation(self, _input, iterations):
+        _input = self.encoder.encode(_input)
+        reservoir_output = self.reservoir.run_simulation([_input], iterations)
         return reservoir_output
 
 
