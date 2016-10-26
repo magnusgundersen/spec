@@ -33,7 +33,7 @@ class RCEncoder:
     def __init__(self):
         pass
 
-    def encode(self, _input):
+    def encode_input(self, _input):
         """
         Encode the input in whatever way.
 
@@ -41,3 +41,12 @@ class RCEncoder:
         :param _input:
         :return:
         """
+        pass
+
+    def encode_output(self, _output):
+        """
+
+        :param _output:
+        :return:
+        """
+        pass

@@ -19,7 +19,7 @@ class Project:
     def __init__(self):
         pass
 
-    def execute_majority_task(self, ca_rule=88, R=4, I=10, data_set_name="8_bit_mix_1000"):
+    def execute_majority_task(self, ca_rule=105, R=1, I=4, data_set_name="8_bit_mix_5000"):
         # Parameters
         fraction_use_for_test = 0.1
 
@@ -41,7 +41,7 @@ class Project:
         rcca_system.train_system(majority_data)
 
         test_score = self.test_majority_task(test_set, rcca_system)
-        visualize_rule = True
+        visualize_rule = False
 
         if visualize_rule:
             vis = bviz.CAVisualizer()
