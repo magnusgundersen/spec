@@ -31,7 +31,7 @@ class ElemCAReservoir:
         for i in range(number_of_generations):
             current_generation = self.run_simulation_step(current_generation, self.current_rule)
             all_generations.append(current_generation)
-        return all_generations[1:]
+        return all_generations[2:]
 
 
     def show_console_printout(self, all_generations):

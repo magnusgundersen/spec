@@ -21,9 +21,10 @@ class RandomMappingEncoder(rcif.RCEncoder):
         input_vectors = []
         new_input = []
 
-        for _ in range(self.R):
+        for i in range(self.R):
             r_list = _input[:]
-            #r_list = [0,0,0,0,0,0,0,0,0,0,0,0]
+            #if i>0:#%2 == 1:
+            #    r_list = [0,0,0,0,0,0,0,0]
             random.shuffle(r_list)
             if self.encoding_scheme == "separate":
                 input_vectors.append([r_list])
@@ -31,7 +32,9 @@ class RandomMappingEncoder(rcif.RCEncoder):
                 new_input.extend(r_list)  # Flatten
 
         if self.encoding_scheme =="concat":
-            input_vectors = [new_input]
+            input_vectors = [[new_input]]
+
+
 
         return input_vectors
 
