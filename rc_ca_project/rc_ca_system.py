@@ -58,6 +58,9 @@ class RCCASystem:
         classifier_training_set = []
         self.rc_framework.fit_to_training_set(training_set, self.iterations)
 
+    def train_temporal_system(self, training_set, timestep_transfer_policy=None):
+        self.rc_framework.fit_to_temporal_training_set(training_set, self.iterations)
+        pass
 
     def predict(self, _input):
         return self.rc_framework.predict(_input, self.iterations)

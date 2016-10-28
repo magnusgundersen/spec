@@ -6,7 +6,7 @@ class RandomMappingEncoder(rcif.RCEncoder):
     def __init__(self):
         super().__init__()
         self.R = 1
-        self.encoding_scheme = "separate"
+        self.encoding_scheme = "concat"
 
     def encode_input(self, _input):
         """
@@ -23,9 +23,9 @@ class RandomMappingEncoder(rcif.RCEncoder):
 
         for i in range(self.R):
             r_list = _input[:]
-            #if i>0:#%2 == 1:
-            #    r_list = [0,0,0,0,0,0,0,0]
-            random.shuffle(r_list)
+            if i>0:#%2 == 1:
+                r_list = [0,0,0,0,0,0,0,0]
+            #random.shuffle(r_list)
             if self.encoding_scheme == "separate":
                 input_vectors.append([r_list])
             elif self.encoding_scheme =="concat":

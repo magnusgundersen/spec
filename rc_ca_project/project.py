@@ -19,7 +19,7 @@ class Project:
     def __init__(self):
         pass
 
-    def execute_majority_task(self, ca_rule=110, R=16, I=32, data_set_name="12_bit_mix_1000"):
+    def execute_majority_task(self, ca_rule=105, R=4, I=12, data_set_name="128_bit_mix_1000"):
         # Parameters
         fraction_use_for_test = 0.1
 
@@ -41,8 +41,8 @@ class Project:
         rcca_system.train_system(majority_data)
 
         test_score = self.test_majority_task(test_set, rcca_system)
-        visualize_rule = True
 
+        visualize_rule = True
         if visualize_rule:
             vis = bviz.CAVisualizer()
             ex_run = rcca_system.run_example_simulation(majority_data[random.randint(0,100)][0], I)
@@ -63,9 +63,9 @@ class Project:
 
             #print("Predicted: " + str(predicted))
             #print("Correct: " + str(_output))
-            if predicted>0.55 and _output == 1:
+            if predicted>=0.5 and _output == 1:
                 number_of_correct += 1
-            elif predicted<0.55 and _output == 0:
+            elif predicted<0.5 and _output == 0:
                 number_of_correct += 1
         print("correct:" + str(number_of_correct) + " of " + str(len(test_set)))
 
@@ -75,6 +75,46 @@ class Project:
             self.visualise_example(visable)
 
         return (number_of_correct / len(test_set)) * 100
+
+    def five_bit_task(self, R=1, I=10, ca_rule=110, T=100):
+        a1_values = [0,0,0,1,1] # 5-bit sequence
+
+
+        # HACK: DUMMY VALUES
+        temporal_training_set = []
+        for _ in range(5):
+            temporal_training_set.append(([1,0,0,0],'001'))
+        for _ in range(T):
+            temporal_training_set.append(([0,0,1,0], '001'))
+        temporal_training_set.append(([0,0,0,1],'001'))
+        for _ in range(5):
+            temporal_training_set.append(([0,0,0,0],'100'))
+
+        # Parameters
+        fraction_use_for_test = 0.1
+
+        rcca_system = rcca.RCCASystem()
+        rcca_system.use_elem_ca(ca_rule)
+        rcca_system.use_svm()
+        rcca_system.use_random_mapping(R)
+        rcca_system.use_uniform_iterations(I)
+
+        #majority_data = self.open_data("majority/" + data_set_name)
+        #majority_data = self.convert_to_array(majority_data)
+
+        # use ten percent as test data
+        #size_of_data = len(majority_data)
+        #test_set_pointer = int(size_of_data * fraction_use_for_test)
+        #test_set = majority_data[:test_set_pointer]
+        #majority_data = majority_data[test_set_pointer:]
+
+        rcca_system.train_temporal_system(temporal_training_set)
+
+        #test_score = self.test_majority_task(test_set, rcca_system)
+
+
+        pass
+
 
     def visualise_example(self, training_array):
         visualizer = bviz.CAVisualizer()
