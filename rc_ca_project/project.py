@@ -7,6 +7,7 @@ from rc_ca_project import rc_ca_system as rcca
 from gui import ca_basic_visualizer as bviz
 import random
 import pprint
+import itertools # for permutations
 
 class Project:
     """
@@ -76,19 +77,10 @@ class Project:
 
         return (number_of_correct / len(test_set)) * 100
 
-    def five_bit_task(self, R=1, I=10, ca_rule=110, T=100):
-        a1_values = [0,0,0,1,1] # 5-bit sequence
+    def five_bit_task(self, R=1, I=10, ca_rule=110):
 
 
-        # HACK: DUMMY VALUES
-        temporal_training_set = []
-        for _ in range(5):
-            temporal_training_set.append(([1,0,0,0],'001'))
-        for _ in range(T):
-            temporal_training_set.append(([0,0,1,0], '001'))
-        temporal_training_set.append(([0,0,0,1],'001'))
-        for _ in range(5):
-            temporal_training_set.append(([0,0,0,0],'100'))
+        n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_10_dist_32")
 
         # Parameters
         fraction_use_for_test = 0.1
@@ -99,21 +91,33 @@ class Project:
         rcca_system.use_random_mapping(R)
         rcca_system.use_uniform_iterations(I)
 
-        #majority_data = self.open_data("majority/" + data_set_name)
-        #majority_data = self.convert_to_array(majority_data)
-
         # use ten percent as test data
-        #size_of_data = len(majority_data)
-        #test_set_pointer = int(size_of_data * fraction_use_for_test)
-        #test_set = majority_data[:test_set_pointer]
-        #majority_data = majority_data[test_set_pointer:]
+        size_of_data = len(n_bit_data)
+        test_set_pointer = int(size_of_data * fraction_use_for_test)
+        test_set = n_bit_data[:test_set_pointer]
+        n_bit_data = n_bit_data[test_set_pointer:]
 
-        rcca_system.train_temporal_system(temporal_training_set)
+        rcca_system.train_temporal_system(n_bit_data)
 
-        #test_score = self.test_majority_task(test_set, rcca_system)
+        test_score = self.test_n_bit_task(test_set, rcca_system)
 
+    def test_n_bit_task(self, test_set, rcca_system, n=5):
+        number_of_correct = 0
+        print("test set: " + str(test_set))
+        for timestep in test_set:
 
-        pass
+            for _input, _output in timestep:
+                predicted = rcca_system.predict_temporal(_input)
+                print("Predicted: " + str(predicted))
+                print("Correct:   " + str(_output))
+        print("correct:" + str(number_of_correct) + " of " + str(len(test_set)))
+
+        run_vis = False  # DOES NOT WORK
+        if run_vis:
+            visable = rcca_system.run_example_simulation(test_set[-1])
+            self.visualise_example(visable)
+
+        return (number_of_correct / len(test_set)) * 100
 
 
     def visualise_example(self, training_array):
@@ -146,6 +150,21 @@ class Project:
                 _input, _output = line.split(" ")
                 dataset.append((_input,_output[0]))
         return dataset
+
+    def open_temporal_data(self, filename):
+        dataset = []
+        with open("../data/"+filename, "r") as f:
+            content = f.readlines()
+            training_set = []
+            for line in content:
+                if line == "\n":
+                    dataset.append(training_set)
+                    training_set = []
+                else:
+                    _input, _output = line.split(" ")
+                    training_set.append(([int(number) for number in _input],_output[0:-1]))
+        return dataset
+
 
 
 

@@ -126,7 +126,7 @@ class ReservoirComputingFramework:
                 print("Output: " + str(_output))
                 if i > 0:
                     _input = self.normalized_adding(transmission_input[i-1], _input)
-                reservoir_output = self.encode_and_execute(_input, iterations)
+                reservoir_output = self.encode_and_execute([_input], iterations)
                 print("reservoir_output: " + str(reservoir_output))
                 transmission_input.append(reservoir_output[-1])
                 timestep_reservoir_outputs.append(reservoir_output)
