@@ -52,26 +52,37 @@ class ReservoirComputingFramework:
     def encoder(self, encoder):
         self._encoder = encoder
 
+    def encode_and_execute(self, _input, iterations):
+        # CONSIDER IF NEED TO BE MOVED
+
+        # NOTE: CURRENTLY DOES NOT SUPPORT R >1 !
+
+        encoded_input = self.encoder.encode_input(_input)
+        reservoir_output = self.reservoir.run_simulation(_input, iterations)
+
+        return reservoir_output
+
+
 
     def fit_to_training_set(self, training_set, iterations):
         """
         must split the training set in what to feed the reservoir and what to fit the classifier to
         :return:
         """
-        number_of_generations = iterations
 
         reservoir_outputs = []
         classifier_outputs = []
+
+        reservoir_outputs2 = self.encode_and_execute(training_set, iterations)
+
+
         for _input, _output in training_set:
-            # TODO: Consider how to feed temporal sequences to the reservoir, ie. [_input1, _input2, ...]
-            #print("Running the training:")
-            #print("INPUT: " + str(_input))
             encoded_input = self.encoder.encode_input(_input)
             #print("Encoded input:" + str(encoded_input))
             unencoded_output = []
 
             for _input in encoded_input:  # If multiple reservoirs
-                reservoir_output = self.reservoir.run_simulation(_input, number_of_generations)
+                reservoir_output = self.reservoir.run_simulation(_input, iterations)
                 reservoir_output = [ca_val for sublist in reservoir_output for ca_val in sublist]  # flatten
                 unencoded_output.append(reservoir_output)
 
@@ -84,36 +95,54 @@ class ReservoirComputingFramework:
         self.classifier.fit(reservoir_outputs,classifier_outputs)
         print("Finished fitting the classifier")
 
-    def fit_to_temporal_training_set(self, training_set, iterations):
-
-        self.classifiers = []
-        for timestep in range(len(training_set)):
-            print("Timestep: " + str(timestep))
-            classifier_outputs = []
-            reservoir_outputs = []
-            print(training_set)
-            print("Training_set: " + str(training_set[timestep]))
-            _input, _output = training_set[timestep]
-            #for (_input, _output) in training_set[timestep]:
-            encoded_input = [_input] # TODO: encoding
-            unencoded_output = []
-            all_output = []
-            for _input2 in encoded_input: # If multiple reservoirs
-                so_far = all_output.append(_input2)
-                reservoir_output = self.reservoir.continue_simulation(so_far, iterations)
-                # CONSIDER IF ONLY THE LAST IS TO BE USED, OR THE NEXT TIMESTEP SHALL CONTINUE ON THE WHOLE ELAPSED CA
-                unencoded_output.append(reservoir_output)
-            encoded_output = self.encoder.encode_output(unencoded_output)
-            reservoir_outputs.append(encoded_output)
-            classifier_outputs.append(_output)
+    def normalized_adding(self, transmission_input, _input):
+        # TODO: REMOVE FROM this class
+        transmitted_output = []
+        for i in range(len(transmission_input)):
+            a = transmission_input[i]
+            b = _input[i]
+            if a == 1 and b ==1:
+                transmitted_output.append(1)
+            elif a ==1 and b ==0:
+                transmitted_output.append(1)
+            elif a == 0 and b == 1:
+                transmitted_output.append(0)
+            elif a == 0 and b ==0:
+                transmitted_output.append(0)
+        return transmitted_output
 
 
 
-            # HACK: currently using linear svm hardcoded
-            # REMOVE
-            classifier = svm.SVC(kernel="linear")
-            classifier.fit(reservoir_outputs, classifier_outputs)
-            self.classifiers.append(classifier)
+    def fit_to_temporal_training_set(self, training_set, iterations, transmission_scheme="adding"):
+        transmission_input = [train_tuple[0] for train_tuple in training_set[0]]  # Initializes the transmission inputs
+
+        classifier_outputs = []
+        timestep_reservoir_outputs = []
+        print("traning_set: " + str(training_set))
+        for i in range(len(training_set)):
+            print("Running first traning_set: " + str(training_set[i]))
+            for _input, _output in training_set[i]:
+                print("Input: " + str(_input))
+                print("Output: " + str(_output))
+                if i > 0:
+                    _input = self.normalized_adding(transmission_input[i-1], _input)
+                reservoir_output = self.encode_and_execute(_input, iterations)
+                print("reservoir_output: " + str(reservoir_output))
+                transmission_input.append(reservoir_output[-1])
+                timestep_reservoir_outputs.append(reservoir_output)
+
+                classifier_outputs.append(_output)
+
+
+
+        flattened_outputs = []
+        for output in timestep_reservoir_outputs:
+            # Flatten
+            new_output = [ca_val for sublist in output for ca_val in sublist]
+            flattened_outputs.append(new_output)
+
+        self.classifier.fit(flattened_outputs, classifier_outputs)
+
 
     def predict(self, _input, iterations):
 

@@ -22,41 +22,25 @@ class ElemCAReservoir:
         return next_generation
 
 
+    def run_simulation(self, initial_inputs, iterations):
+        """
+        Runs a simulation of the initial input, for a given iterations
 
-    def run_simulation(self, initial_inputs, number_of_generations):
+        Returns the whole list of generations
+        :param initial_inputs:
+        :param iterations:
+        :return:
+        """
         all_generations = []
-        number_of_input_vectors = len(initial_inputs)
         all_generations.append(initial_inputs.pop(0))
         current_generation = all_generations[0]
-        for i in range(number_of_generations):
-            current_generation = self.run_simulation_step(current_generation, self.current_rule)
-            all_generations.append(current_generation)
-        return all_generations#[-1:]
-
-    def continue_simulation(self, simulated, iterations):
-        # TODO: run_simulation and this should use the same simulation-basis
-        all_generations = simulated[:]
-        current_generation = all_generations[-1]
         for i in range(iterations):
             current_generation = self.run_simulation_step(current_generation, self.current_rule)
             all_generations.append(current_generation)
-        return all_generations#[-1:]
-
-
-    def show_console_printout(self, all_generations):
-        for gen in all_generations:
-            genstring = ""
-            for ind in gen:
-                if ind == 1:
-                    genstring += "X"
-                else:
-                    genstring += " "
-            print(genstring)
-
-
-
+        return all_generations
 
 class CAGeneration:
+    # TODO:
     def __init__(self):
         pass
 
@@ -78,8 +62,7 @@ class Rule:
         :param rule_number:
         :return:
         """
-        binrule = bin(rule_number)
-        binrule = format(rule_number,"08b")
+        binrule = format(rule_number, "08b")  # convert to binary, with fill of zeros until the string is of length 8
 
         rule = {
             (1,1,1): int(binrule[0]),
