@@ -82,6 +82,8 @@ class Project:
 
         n_bit_data = self.open_temporal_data("temp_n_bit/8_bit_1_dist_256")
 
+        rcca_problem = rcca.RCCAProblem(n_bit_data)
+
         # Parameters
         fraction_use_for_test = 0.1
 
@@ -91,15 +93,13 @@ class Project:
         rcca_system.use_random_mapping(R)
         rcca_system.use_uniform_iterations(I)
 
-        # use ten percent as test data
-        size_of_data = len(n_bit_data)
-        test_set_pointer = int(size_of_data * fraction_use_for_test)
-        test_set = n_bit_data[:test_set_pointer]
-        n_bit_data = n_bit_data[test_set_pointer:]
+        rcca_system.set_problem(rcca_problem)
 
-        rcca_system.train_temporal_system(n_bit_data)
 
-        test_score = self.test_n_bit_task(test_set, rcca_system)
+
+        #rcca_system.train_temporal_system(n_bit_data)
+
+
 
     def test_n_bit_task(self, test_set, rcca_system, n=5):
         number_of_correct = 0

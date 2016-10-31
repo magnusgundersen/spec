@@ -72,4 +72,104 @@ class RCCASystem:
     def run_example_simulation(self, _input, iterations):
         return self.rc_framework.run_example_simulation(_input, iterations)
 
+    # Below is experimental code
+    def set_problem(self, rcca_problem):
+        self.rcca_problem = rcca_problem
+
+    def fit_to_problem(self):
+        """
+
+        :return:
+        """
+        if self.rcca_problem is None:
+            raise ValueError("No RCCAProblem set!")
+
+        # Run each training-example through the rc-framework
+        for training_example in self.rcca_problem.training_data:
+            #  We now have a timeseries of data, on which the rc-framework must be fitted
+            for time_series_data in training_example:
+                # The time_step now contains a list of tuples of inputs and outputs
+
+                self.rc_framework.fit_to_data(time_series_data)
+
+
+
+
+
+
+class RCCAProblem:
+    """
+    This class is used to precisely describe problems that may be feeded to the rcca-system
+    """
+    def __init__(self, example_runs):
+        """
+        The example runs parameter is used to input some example data to the system. Must be on the form:
+
+        data =
+        [
+        [ (input, output),
+          (input, output)
+        ],
+        [ (input, output),
+          (input, output)
+        ]
+        ]
+
+        Each list in the list corresponds to a temporal run of the system. If the problem is non-temporal the following
+        data set is used:
+
+        data =
+        [
+        [(input, output)],
+        [(input, output)]
+        ]
+
+        :param example_runs:
+        """
+
+        self.number_of_time_steps = 1
+        self.is_temporal = False
+        self.training_data = []
+        self.initialize_training_data(example_runs)
+    @staticmethod
+    def check_data_validity(ex_data):
+
+        try:
+            training_set_size = len(ex_data)
+        except Exception as e:
+            raise ValueError("Data must be a list!" + str(e))
+
+
+        try:
+            number_of_time_steps = len(ex_data[0])
+        except Exception as e:
+            raise ValueError("Data in each training-example was bad " + str(e))
+
+
+        for data in ex_data:
+            if len(data) != number_of_time_steps:
+                raise ValueError("Every training set data must have same size! ")
+
+
+    def initialize_training_data(self, example_data):
+        self.check_data_validity(example_data)
+
+        self.number_of_time_steps = len(example_data[0])
+
+        self.training_data = example_data
+
+        if self.number_of_time_steps > 1:
+            self.is_temporal = True
+
+
+    def get_timeseries_data(self):
+        """
+        Returns a list of the timeseries data
+        :return:
+        """
+        if self.is_temporal:
+            return self.training_data
+
+
+
 

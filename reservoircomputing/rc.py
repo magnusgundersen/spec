@@ -70,6 +70,13 @@ class ReservoirComputingFramework:
         return reservoir_outputs
 
 
+    def fit_to_training_data(self):
+        """
+        Function to be used for fitting the whole rc-system to some data set.
+        May be both temporal and non-temporal
+        :return:
+        """
+        pass
 
     def fit_to_training_set(self, training_set, iterations):
         """
@@ -212,5 +219,38 @@ class ReservoirComputingFramework:
 
         #encoded_output = self.encoder.encode_output(unencoded_output)
         return unencoded_output
+
+    # Expermiental is below!
+
+    def fit_to_data(self, training_data, transmission_scheme="addition"):
+        """
+
+        The input consists of data:
+
+        temporal_data =
+        [
+        (input, output),
+        (input, output)
+        ]
+
+        or:
+
+        non_temporal_data =
+        [
+        (input, output)
+        ]
+
+        :param training_data:
+        :return:
+        """
+
+        transmission_data = []
+        current_time_step = 0
+        for _input, _output in training_data: # input and output at each timestep
+            if current_time_step > 0:
+                _input = self.time_transistor.translate()
+
+            current_time_step += 1
+            # TODO: Here it must come something to do with the transmission between the time steps!
 
 
