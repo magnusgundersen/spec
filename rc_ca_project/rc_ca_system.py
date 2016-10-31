@@ -66,7 +66,8 @@ class RCCASystem:
         return self.rc_framework.predict(_input, self.iterations)
 
     def predict_temporal(self, _input):
-        return self.rc_framework.predict(_input, self.iterations)
+
+        return self.rc_framework.predict_temporal_system(_input, self.iterations)
 
     def run_example_simulation(self, _input, iterations):
         return self.rc_framework.run_example_simulation(_input, iterations)

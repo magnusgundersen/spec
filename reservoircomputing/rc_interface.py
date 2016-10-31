@@ -26,6 +26,9 @@ class RCReservoir:
     def __init__(self):
         pass
 
+    def run_simulation(self, _input):
+        raise NotImplementedError
+
 class RCEncoder:
     """
 
@@ -41,7 +44,7 @@ class RCEncoder:
         :param _input:
         :return:
         """
-        pass
+        raise NotImplementedError
 
     def encode_output(self, _output):
         """
@@ -49,4 +52,4 @@ class RCEncoder:
         :param _output:
         :return:
         """
-        pass
+        raise NotImplementedError

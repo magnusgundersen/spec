@@ -56,7 +56,6 @@ class ReservoirComputingFramework:
         # CONSIDER IF NEED TO BE MOVED
 
         # NOTE: CURRENTLY DOES NOT SUPPORT R >1 !
-
         encoded_input = self.encoder.encode_input(_input)
         reservoir_output = self.reservoir.run_simulation(_input, iterations)
 
@@ -72,8 +71,6 @@ class ReservoirComputingFramework:
 
         reservoir_outputs = []
         classifier_outputs = []
-
-        reservoir_outputs2 = self.encode_and_execute(training_set, iterations)
 
 
         for _input, _output in training_set:
@@ -114,21 +111,26 @@ class ReservoirComputingFramework:
 
 
     def fit_to_temporal_training_set(self, training_set, iterations, transmission_scheme="adding"):
+        """
+        Fits the trainer to the temporal data
+
+        transmission scheme
+
+        :param training_set:
+        :param iterations:
+        :param transmission_scheme:
+        :return:
+        """
         transmission_input = [train_tuple[0] for train_tuple in training_set[0]]  # Initializes the transmission inputs
 
         classifier_outputs = []
         timestep_reservoir_outputs = []
-        print("traning_set: " + str(training_set))
         for i in range(len(training_set)):
-            print("Running first traning_set: " + str(training_set[i]))
             for _input, _output in training_set[i]:
-                print("Input: " + str(_input))
-                print("Output: " + str(_output))
                 if i > 0:
                     _input = self.normalized_adding(transmission_input[i-1], _input)
                 reservoir_output = self.encode_and_execute([_input], iterations)
-                print("reservoir_output: " + str(reservoir_output))
-                transmission_input.append(reservoir_output[-1])
+                transmission_input.append(reservoir_output[-1]) # append the last state to norm. add the next gen
                 timestep_reservoir_outputs.append(reservoir_output)
 
                 classifier_outputs.append(_output)
@@ -140,6 +142,12 @@ class ReservoirComputingFramework:
             # Flatten
             new_output = [ca_val for sublist in output for ca_val in sublist]
             flattened_outputs.append(new_output)
+        print("-----")
+        print("Flattened output to train the calssifier:")
+        print(len(flattened_outputs))
+        print(flattened_outputs[0])
+        print("-")
+
 
         self.classifier.fit(flattened_outputs, classifier_outputs)
 
@@ -158,19 +166,25 @@ class ReservoirComputingFramework:
 
     def predict_temporal_system(self, temporal_input, iterations):
         predictions = []
-        for timestep in range(temporal_input):
-            encoded_input = temporal_input[timestep]
+        transmission_input = [train_input for train_input in temporal_input[0]]
+
+        for i in range(len(temporal_input)):
+            predictions_at_this_timestep = []
+            encoded_input = temporal_input[i]
             unencoded_output = []
             all_output = []
             for _input in encoded_input:
-                so_far = all_output.extend(_input)
-                reservoir_output = self.reservoir.continue_simulation(so_far, iterations)
-                #reservoir_output = [ca_val for sublist in reservoir_output for ca_val in sublist]  # flatten
-                unencoded_output.append(reservoir_output)
-            encoded_output = self.encoder.encode_output(unencoded_output)
+                if i > 0:
+                    _input = self.normalized_adding(transmission_input[i-1], _input)
 
-            predictions.append(self.classifiers[timestep].
-                               predict(np.array(encoded_output).reshape(-1, len(encoded_output))))
+                reservoir_output = self.encode_and_execute([_input], iterations)
+                transmission_input.append(reservoir_output[-1])
+                reservoir_output = [ca_val for sublist in reservoir_output for ca_val in sublist]  # flatten
+                prediction = self.classifier.predict(np.array(reservoir_output).reshape(-1, len(reservoir_output)))
+                predictions_at_this_timestep.append(prediction)
+
+            predictions.append(predictions_at_this_timestep)
+
         return predictions
 
 

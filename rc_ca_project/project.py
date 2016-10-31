@@ -20,7 +20,7 @@ class Project:
     def __init__(self):
         pass
 
-    def execute_majority_task(self, ca_rule=105, R=4, I=4, data_set_name="8_bit_mix_1000"):
+    def execute_majority_task(self, ca_rule=110, R=8, I=64, data_set_name="8_bit_mix_1000"):
         # Parameters
         fraction_use_for_test = 0.1
 
@@ -80,7 +80,7 @@ class Project:
     def five_bit_task(self, R=1, I=10, ca_rule=110):
 
 
-        n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_10_dist_32")
+        n_bit_data = self.open_temporal_data("temp_n_bit/8_bit_1_dist_256")
 
         # Parameters
         fraction_use_for_test = 0.1
@@ -104,13 +104,29 @@ class Project:
     def test_n_bit_task(self, test_set, rcca_system, n=5):
         number_of_correct = 0
         print("test set: " + str(test_set))
+
+        test_set_inputs = [[temporal_list2[0] for temporal_list2 in temporal_list] for temporal_list in test_set]
+        test_set_outputs = [[temporal_list2[1] for temporal_list2 in temporal_list] for temporal_list in test_set]
+        print("inputs: " + str(test_set_inputs))
+        predictions = rcca_system.predict_temporal(test_set_inputs)
+
+        for i in range(len(predictions)):
+            if predictions[i] == test_set_outputs[i]:
+                print("Correct!")
+            print("Prediction: " + str(predictions[i]))
+            print("Correct:    " + str(test_set_outputs[i]))
+
+
+
+        """
         for timestep in test_set:
 
             for _input, _output in timestep:
                 predicted = rcca_system.predict_temporal(_input)
                 print("Predicted: " + str(predicted))
                 print("Correct:   " + str(_output))
-        print("correct:" + str(number_of_correct) + " of " + str(len(test_set)))
+        #print("correct:" + str(number_of_correct) + " of " + str(len(test_set)))
+        """
 
         run_vis = False  # DOES NOT WORK
         if run_vis:

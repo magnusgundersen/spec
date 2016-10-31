@@ -35,7 +35,7 @@ def generate_n_bit_file(n, distractor_period, number_of_training_sets):
         # Cue signal
         _input = "0001"
         _output = "001"
-
+        training_set += _input + " " + _output + "\n"
         # repeated n bit signal
         for signal_entry in signal:
             _input = "0000"
@@ -53,6 +53,6 @@ def get_input_by_a1_value(a1_value):
         return "1000", "100"
     else:
         return "0100", "010"
-generate_n_bit_file(5, 10, 70)
+generate_n_bit_file(8, 1, 512)
 
 
