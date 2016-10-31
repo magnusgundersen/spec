@@ -31,8 +31,7 @@ class ElemCAReservoir:
         :param iterations:
         :return:
         """
-        all_generations = []
-        all_generations.append(initial_inputs.pop(0))
+        all_generations = [initial_inputs]
         current_generation = all_generations[0]
         for i in range(iterations):
             current_generation = self.run_simulation_step(current_generation, self.current_rule)
@@ -78,7 +77,6 @@ class Rule:
         return rule
 
     def getOutput(self, input_array):
-        output = 0
         if len(input_array) != 3:
             raise ValueError
 

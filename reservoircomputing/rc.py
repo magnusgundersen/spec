@@ -4,6 +4,7 @@ Module for reservoir computing. Modular implemented.
 The classifier and reservoir must implement the interfaces as described by the rc_interface.py-module
 """
 import numpy as np
+import random
 
 import sklearn.svm as svm  # REMOVE! SEE HACK below
 
@@ -56,10 +57,17 @@ class ReservoirComputingFramework:
         # CONSIDER IF NEED TO BE MOVED
 
         # NOTE: CURRENTLY DOES NOT SUPPORT R >1 !
-        encoded_input = self.encoder.encode_input(_input)
-        reservoir_output = self.reservoir.run_simulation(_input, iterations)
 
-        return reservoir_output
+
+        encoded_inputs = self.encoder.encode_input(_input)
+        reservoir_outputs = []
+        print("Encoded inputs: " + str(encoded_inputs))
+        for encoded_input in encoded_inputs:
+            reservoir_outputs.append(self.reservoir.run_simulation(encoded_input, iterations))
+
+
+
+        return reservoir_outputs
 
 
 
@@ -98,12 +106,13 @@ class ReservoirComputingFramework:
         for i in range(len(transmission_input)):
             a = transmission_input[i]
             b = _input[i]
+            print("A and B: " + str(a) + " " + str(b))
             if a == 1 and b ==1:
                 transmitted_output.append(1)
             elif a ==1 and b ==0:
-                transmitted_output.append(1)
+                transmitted_output.append(random.choice([0, 1]))
             elif a == 0 and b == 1:
-                transmitted_output.append(0)
+                transmitted_output.append(random.choice([0, 1]))
             elif a == 0 and b ==0:
                 transmitted_output.append(0)
         return transmitted_output
@@ -121,17 +130,21 @@ class ReservoirComputingFramework:
         :param transmission_scheme:
         :return:
         """
-        transmission_input = [train_tuple[0] for train_tuple in training_set[0]]  # Initializes the transmission inputs
-
+        transmission_input = [[train_tuple[0] for _ in range(self.encoder.R)] for train_tuple in training_set[0]]  # Initializes the transmission inputs
+        print("Transmission_input: " + str(transmission_input))
         classifier_outputs = []
         timestep_reservoir_outputs = []
         for i in range(len(training_set)):
             for _input, _output in training_set[i]:
                 if i > 0:
                     _input = self.normalized_adding(transmission_input[i-1], _input)
-                reservoir_output = self.encode_and_execute([_input], iterations)
-                transmission_input.append(reservoir_output[-1]) # append the last state to norm. add the next gen
-                timestep_reservoir_outputs.append(reservoir_output)
+                    # MAJOR PROBLEM: This style of encoding encodes R times each timstep
+                    # The same encoding must following in time
+
+                reservoir_output = self.encode_and_execute(_input, iterations)  # This is a list of lists
+
+                transmission_input.append([reservoir_output[j][-1] for j in range(len(reservoir_output))])  # append the last state to norm. add the next gen
+                timestep_reservoir_outputs.append(self.encoder.encode_output(reservoir_output))  # Flatten
 
                 classifier_outputs.append(_output)
 

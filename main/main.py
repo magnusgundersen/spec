@@ -21,7 +21,7 @@ __author__ = 'magnus'
 
 def main():
     p = project.Project()
-    #p.execute_test1()
+
 
 
     print(p.execute_majority_task())

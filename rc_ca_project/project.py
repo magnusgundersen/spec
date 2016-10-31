@@ -20,7 +20,7 @@ class Project:
     def __init__(self):
         pass
 
-    def execute_majority_task(self, ca_rule=110, R=8, I=64, data_set_name="8_bit_mix_1000"):
+    def execute_majority_task(self, ca_rule=1, R=16, I=128, data_set_name="8_bit_mix_1000"):
         # Parameters
         fraction_use_for_test = 0.1
 
@@ -77,7 +77,7 @@ class Project:
 
         return (number_of_correct / len(test_set)) * 100
 
-    def five_bit_task(self, R=1, I=10, ca_rule=110):
+    def five_bit_task(self, R=4, I=10, ca_rule=90):
 
 
         n_bit_data = self.open_temporal_data("temp_n_bit/8_bit_1_dist_256")
