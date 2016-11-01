@@ -6,7 +6,7 @@ The classifier and reservoir must implement the interfaces as described by the r
 import numpy as np
 import random
 
-import sklearn.svm as svm  # REMOVE! SEE HACK below
+
 
 class ReservoirComputingFramework:
     """
@@ -247,6 +247,8 @@ class ReservoirComputingFramework:
         transmission_data = []
         current_time_step = 0
         for _input, _output in training_data: # input and output at each timestep
+
+            # todo: The propagation policy must be implemented here
             if current_time_step > 0:
                 _input = self.time_transistor.translate()
 
