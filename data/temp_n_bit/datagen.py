@@ -38,7 +38,7 @@ def generate_n_bit_file(n, distractor_period, number_of_training_sets):
         training_set += _input + " " + _output + "\n"
         # repeated n bit signal
         for signal_entry in signal:
-            _input = "0000"
+            _input = "0010"
             _output = signal_entry
             training_set += _input + " " + _output + "\n"
 
@@ -53,6 +53,6 @@ def get_input_by_a1_value(a1_value):
         return "1000", "100"
     else:
         return "0100", "010"
-generate_n_bit_file(20, 200, 1024)
+generate_n_bit_file(5, 100, 1024)
 
 

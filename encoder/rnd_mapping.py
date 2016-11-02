@@ -50,3 +50,4 @@ class RandomMappingEncoder(rcif.RCEncoder):
         # Flatten
         _output = [ca_val for sublist in _output for ca_val in sublist]
         return _output
+
