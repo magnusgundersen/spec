@@ -5,8 +5,10 @@ The classifier and reservoir must implement the interfaces as described by the r
 """
 import numpy as np
 import random
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-import sklearn.svm as svm  # REMOVE! SEE HACK below
+
 
 class ReservoirComputingFramework:
     """
@@ -22,6 +24,9 @@ class ReservoirComputingFramework:
         self._reservoir = None
         self._classifier = None
         self._encoder = None
+
+        self.classifier_input_set = []
+        self.classifier_output_set = []
 
     @property
     def reservoir(self):
@@ -53,6 +58,10 @@ class ReservoirComputingFramework:
     def encoder(self, encoder):
         self._encoder = encoder
 
+    def set_helper(self, rc_helper):
+        self.rc_helper = rc_helper
+        self.classifier = rc_helper.config.classifier
+
     def encode_and_execute(self, _input, iterations):
         # CONSIDER IF NEED TO BE MOVED
 
@@ -70,6 +79,13 @@ class ReservoirComputingFramework:
         return reservoir_outputs
 
 
+    def fit_to_training_data(self):
+        """
+        Function to be used for fitting the whole rc-system to some data set.
+        May be both temporal and non-temporal
+        :return:
+        """
+        pass
 
     def fit_to_training_set(self, training_set, iterations):
         """
@@ -165,7 +181,7 @@ class ReservoirComputingFramework:
         self.classifier.fit(flattened_outputs, classifier_outputs)
 
 
-    def predict(self, _input, iterations):
+    def predict_old(self, _input, iterations):
 
         encoded_input = self.encoder.encode_input(_input)
         unencoded_output = []
@@ -212,5 +228,170 @@ class ReservoirComputingFramework:
 
         #encoded_output = self.encoder.encode_output(unencoded_output)
         return unencoded_output
+
+    # Expermiental is below!
+
+    def fit_to_data(self, training_data):
+        """
+
+        The input consists of data:
+
+        temporal_data =
+        [
+        (input, output),
+        (input, output)
+        ]
+
+        or:
+
+        non_temporal_data =
+        [
+        (input, output)
+        ]
+
+        :param training_data:
+        :return:
+        """
+
+        self.rc_helper.reset()
+
+        for _input, _output in training_data: # input and output at each timestep
+            rc_output = self.rc_helper.run_input(_input)
+            # make training-set for the classifier:
+            self.classifier_input_set.append(rc_output.flattened_states)
+            self.classifier_output_set.append(_output)
+
+
+
+
+    def train_classifier(self):
+        print("Fitting classifier")
+        self.classifier.fit(self.classifier_input_set, self.classifier_output_set)
+
+    def predict(self, test_data):
+        """
+
+                The input consists of data:
+
+                temporal_data =
+                [
+                (input, output),
+                (input, output)
+                ]
+
+                or:
+
+                non_temporal_data =
+                [
+                (input, output)
+                ]
+
+                :param training_data:
+                :return:
+        """
+
+        _outputs = []
+        classifier_input_set = []
+        self.rc_helper.reset()
+        number_of_correct = 0
+        for _input, _output in test_data:  # input and output at each timestep
+            rc_output = self.rc_helper.run_input(_input)
+            classifier_input = rc_output.flattened_states
+            classifier_prediction = self.classifier.predict(classifier_input)
+            _outputs.append(classifier_prediction)
+
+
+            # HACK
+            #print("Correct class: " + str(_output))
+            #print("predicted cls: " + str(classifier_prediction))
+            if _output == classifier_prediction[0]:
+                number_of_correct += 1
+
+        return _outputs
+
+
+
+
+        return _outputs
+
+
+
+
+
+
+
+class RCHelper:
+    def __init__(self, external_config):
+        self.config = external_config
+        self.encoder = self.config.encoder
+        self.time_transition = self.config.time_transition
+        self.reservoir = self.config.reservoir
+        self.I = self.config.I
+
+
+    def reset(self):
+        self.time_step = 0
+        self.previous_data = []
+        self.last_step_data = [] #ONLY FOR CONCAT RESERVOIRS!
+
+    def run_input(self, _input):
+        # Run input that is deptandant on previous inputs
+        # 1. step is to consider if the reservoir landscape is parallelized
+        # TODO: currently not implemented
+
+        # 2. Step is to encode the input
+        encoded_inputs = self.encoder.encode_input(_input)  # List of lists
+
+        # 3. Step is to concat or keep the inputs by themselves
+        # TODO: Remove this if you want to be able to have separate reservoirs!
+        encoded_input = [val for sublist in encoded_inputs for val in sublist]
+
+        # 4. step is to use transition to take previous steps into account
+        if self.time_step > 0: # No transition at first time step
+            transitioned_data = self.time_transition.normalized_adding(self.last_step_data, encoded_input)
+        else:
+            transitioned_data = encoded_input
+
+        # 5. step is to propagate in CA reservoir
+        all_propagated_data = self.reservoir.run_simulation(transitioned_data, self.I)
+
+        # 6. step is to create an output-object
+        output = RCOutput()
+        output.set_states(all_propagated_data, self.previous_data)
+
+        return output
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class RCOutput:
+
+    def __init__(self):
+        self.list_of_states = []
+        self.transitioned_state = []
+        self.flattened_states = []
+
+    def set_states(self, all_states, transitioned_state):
+        self.list_of_states = all_states
+        self.transitioned_state = transitioned_state
+        self.flattened_states = [state_val for sublist in all_states for state_val in sublist]
+
+
+
+
+
+
+
 
 

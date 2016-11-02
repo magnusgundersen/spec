@@ -24,7 +24,7 @@ def main():
 
 
 
-    print(p.execute_majority_task())
+    print(p.majority_task())
     #print(p.five_bit_task())
 
 
