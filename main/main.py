@@ -24,8 +24,8 @@ def main():
 
 
 
-    print(p.majority_task())
-    #print(p.five_bit_task())
+    #print(p.majority_task())
+    print(p.n_bit_task())
 
 
 if __name__ == "__main__":
