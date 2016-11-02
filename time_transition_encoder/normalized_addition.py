@@ -13,7 +13,6 @@ class RandomAdditionTimeTransition:
         for i in range(len(transmission_input)):
             a = transmission_input[i]
             b = _input[i]
-            print("A and B: " + str(a) + " " + str(b))
             if a == 1 and b ==1:
                 transmitted_output.append(1)
             elif a ==1 and b ==0:

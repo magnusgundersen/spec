@@ -20,70 +20,17 @@ class Project:
     def __init__(self):
         pass
 
-    def execute_majority_task(self, ca_rule=1, R=16, I=128, data_set_name="8_bit_mix_1000"):
-        # Parameters
-        fraction_use_for_test = 0.1
 
-        rcca_system = rcca.RCCASystem()
-        rcca_system.use_elem_ca(ca_rule)
-        rcca_system.use_svm()
-        rcca_system.use_random_mapping(R)
-        rcca_system.use_uniform_iterations(I)
 
-        majority_data = self.open_data("majority/"+data_set_name)
-        majority_data = self.convert_to_array(majority_data)
 
-        # use ten percent as test data
-        size_of_data = len(majority_data)
-        test_set_pointer = int(size_of_data*fraction_use_for_test)
-        test_set = majority_data[:test_set_pointer]
-        majority_data = majority_data[test_set_pointer:]
 
-        rcca_system.train_system(majority_data)
-
-        test_score = self.test_majority_task(test_set, rcca_system)
-
-        visualize_rule = True
-        if visualize_rule:
-            vis = bviz.CAVisualizer()
-            ex_run = rcca_system.run_example_simulation(majority_data[random.randint(0,100)][0], I)
-            vis.visualize_multiple_reservoirs(ex_run)
-            #pprint.pprint(ex_run)
-            #print(ex_run)
-            #vis.rule_vizualize(ca_rule, R, I, majority_data[random.randint(0,100)][0])
-        return {"dataset": data_set_name,
-                "ca_rule": ca_rule,
-                "R": R,
-                "I": I,
-                "correct": test_score}
-
-    def test_majority_task(self, test_set, rcca_system):
-        number_of_correct = 0
-        for _input, _output in test_set:
-            predicted = rcca_system.predict(_input)
-
-            #print("Predicted: " + str(predicted))
-            #print("Correct: " + str(_output))
-            if predicted>=0.5 and _output == 1:
-                number_of_correct += 1
-            elif predicted<0.5 and _output == 0:
-                number_of_correct += 1
-        print("correct:" + str(number_of_correct) + " of " + str(len(test_set)))
-
-        run_vis = False  # DOES NOT WORK
-        if run_vis:
-            visable = rcca_system.run_example_simulation(test_set[-1])
-            self.visualise_example(visable)
-
-        return (number_of_correct / len(test_set)) * 100
-
-    def five_bit_task(self):
+    def n_bit_task(self, n=5):
 
 
         n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_100_dist_32")
         rcca_problem = rcca.RCCAProblem(n_bit_data)
         rcca_config = rcca.RCCAConfig()
-        rcca_config.set_single_reservoir_config(ca_rule=105, R=64, I=64, classifier="linear-svm",
+        rcca_config.set_single_reservoir_config(ca_rule=110, R=64, I=32, classifier="linear-svm",
                                                 encoding="random_mapping", time_transition="normalized_addition")
 
 
@@ -96,7 +43,7 @@ class Project:
         rcca_system.set_config(rcca_config)
         rcca_system.initialize_rc()
 
-        rcca_system.fit_to_problem(test_set_size=0.1)
+        rcca_system.fit_to_problem(test_set_size=0.2)
 
 
     def majority_task(self):
@@ -106,7 +53,7 @@ class Project:
 
         rcca_problem = rcca.RCCAProblem(majority_data)
         rcca_config = rcca.RCCAConfig()
-        rcca_config.set_single_reservoir_config(ca_rule=90, R=1, I=3, classifier="linear-svm",
+        rcca_config.set_single_reservoir_config(ca_rule=110, R=32, I=16, classifier="linear-svm",
                                                 encoding="random_mapping", time_transition="normalized_addition")
 
         rcca_system = rcca.RCCASystem()
@@ -117,41 +64,6 @@ class Project:
 
         rcca_system.fit_to_problem(test_set_size=0.1)
 
-
-
-    def test_n_bit_task(self, test_set, rcca_system, n=5):
-        number_of_correct = 0
-        print("test set: " + str(test_set))
-
-        test_set_inputs = [[temporal_list2[0] for temporal_list2 in temporal_list] for temporal_list in test_set]
-        test_set_outputs = [[temporal_list2[1] for temporal_list2 in temporal_list] for temporal_list in test_set]
-        print("inputs: " + str(test_set_inputs))
-        predictions = rcca_system.predict_temporal(test_set_inputs)
-
-        for i in range(len(predictions)):
-            if predictions[i] == test_set_outputs[i]:
-                print("Correct!")
-            print("Prediction: " + str(predictions[i]))
-            print("Correct:    " + str(test_set_outputs[i]))
-
-
-
-        """
-        for timestep in test_set:
-
-            for _input, _output in timestep:
-                predicted = rcca_system.predict_temporal(_input)
-                print("Predicted: " + str(predicted))
-                print("Correct:   " + str(_output))
-        #print("correct:" + str(number_of_correct) + " of " + str(len(test_set)))
-        """
-
-        run_vis = False  # DOES NOT WORK
-        if run_vis:
-            visable = rcca_system.run_example_simulation(test_set[-1])
-            self.visualise_example(visable)
-
-        return (number_of_correct / len(test_set)) * 100
 
 
     def visualise_example(self, training_array):

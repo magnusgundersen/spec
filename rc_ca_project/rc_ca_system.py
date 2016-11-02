@@ -48,31 +48,6 @@ class RCCASystem:
     def use_uniform_iterations(self, I):
         self.iterations = I
 
-
-
-
-    def train_system(self, training_set):
-        """
-        pairs of training-vector and correct classifiers
-
-        """
-        classifier_training_set = []
-        self.rc_framework.fit_to_training_set(training_set, self.iterations)
-
-    def train_temporal_system(self, training_set, timestep_transfer_policy=None):
-        self.rc_framework.fit_to_temporal_training_set(training_set, self.iterations)
-
-
-    def predict(self, _input):
-        return self.rc_framework.predict(_input, self.iterations)
-
-    def predict_temporal(self, _input):
-
-        return self.rc_framework.predict_temporal_system(_input, self.iterations)
-
-    def run_example_simulation(self, _input, iterations):
-        return self.rc_framework.run_example_simulation(_input, iterations)
-
     # Below is experimental code
     def set_problem(self, rcca_problem):
         self.rcca_problem = rcca_problem
@@ -98,8 +73,8 @@ class RCCASystem:
             raise ValueError("No RCCAProblem set!")
 
         # divide training_data:
-        training_data = self.rcca_problem.training_data[:int(len(self.rcca_problem.training_data)*test_set_size)]
-        test_data = self.rcca_problem.training_data[int(len(self.rcca_problem.training_data)*test_set_size):]
+        training_data = self.rcca_problem.training_data[:int(len(self.rcca_problem.training_data)*(1-test_set_size))]
+        test_data = self.rcca_problem.training_data[int(len(self.rcca_problem.training_data)*(1-test_set_size)):]
 
 
         # Run each training-example through the rc-framework
@@ -232,7 +207,7 @@ class RCCAConfig(rc_if.ExternalRCConfig):
             self.encoder.R = R
 
         self.I = I
-        if time_transition=="normalized_adding":
+        if time_transition=="normalized_addition":
             self.time_transition = norm_add.RandomAdditionTimeTransition()
 
 
