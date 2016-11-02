@@ -77,27 +77,45 @@ class Project:
 
         return (number_of_correct / len(test_set)) * 100
 
-    def five_bit_task(self, R=4, I=10, ca_rule=90):
+    def five_bit_task(self):
 
 
-        n_bit_data = self.open_temporal_data("temp_n_bit/8_bit_1_dist_256")
-
+        n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_100_dist_32")
         rcca_problem = rcca.RCCAProblem(n_bit_data)
+        rcca_config = rcca.RCCAConfig()
+        rcca_config.set_single_reservoir_config(ca_rule=105, R=64, I=64, classifier="linear-svm",
+                                                encoding="random_mapping", time_transition="normalized_addition")
 
-        # Parameters
-        fraction_use_for_test = 0.1
 
         rcca_system = rcca.RCCASystem()
-        rcca_system.use_elem_ca(ca_rule)
-        rcca_system.use_svm()
-        rcca_system.use_random_mapping(R)
-        rcca_system.use_uniform_iterations(I)
+
+
+
+
+        rcca_system.set_problem(rcca_problem)
+        rcca_system.set_config(rcca_config)
+        rcca_system.initialize_rc()
+
+        rcca_system.fit_to_problem(test_set_size=0.1)
+
+
+    def majority_task(self):
+
+        majority_data = self.open_temporal_data("majority/8_bit_mix_1000")
+
+
+        rcca_problem = rcca.RCCAProblem(majority_data)
+        rcca_config = rcca.RCCAConfig()
+        rcca_config.set_single_reservoir_config(ca_rule=90, R=1, I=3, classifier="linear-svm",
+                                                encoding="random_mapping", time_transition="normalized_addition")
+
+        rcca_system = rcca.RCCASystem()
 
         rcca_system.set_problem(rcca_problem)
+        rcca_system.set_config(rcca_config)
+        rcca_system.initialize_rc()
 
-
-
-        #rcca_system.train_temporal_system(n_bit_data)
+        rcca_system.fit_to_problem(test_set_size=0.1)
 
 
 

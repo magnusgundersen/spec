@@ -53,3 +53,8 @@ class RCEncoder:
         :return:
         """
         raise NotImplementedError
+
+
+class ExternalRCConfig:
+    def __init__(self):
+        pass

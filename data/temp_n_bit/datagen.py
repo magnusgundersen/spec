@@ -53,6 +53,6 @@ def get_input_by_a1_value(a1_value):
         return "1000", "100"
     else:
         return "0100", "010"
-generate_n_bit_file(8, 1, 512)
+generate_n_bit_file(20, 200, 1024)
 
 
