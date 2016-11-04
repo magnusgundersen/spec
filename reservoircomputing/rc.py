@@ -267,7 +267,7 @@ class ReservoirComputingFramework:
     def train_classifier(self):
         print("Fitting classifier")
         print(len(self.classifier_input_set))
-        for _ in range(3):
+        for _ in range(4):
             self.classifier_input_set += self.classifier_input_set
             self.classifier_output_set += self.classifier_output_set
         print(len(self.classifier_input_set))

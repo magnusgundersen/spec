@@ -32,7 +32,7 @@ class Project:
         rcca_problem = rcca.RCCAProblem(n_bit_data)
         rcca_config = rcca.RCCAConfig()
         rcca_config.set_single_reservoir_config(ca_rule=90, R=32, I=32, classifier="linear-svm",
-                                                encoding="random_mapping", time_transition="random_permutation")
+                                                encoding="random_mapping", time_transition="normalized_addition")
 
 
         rcca_system = rcca.RCCASystem()

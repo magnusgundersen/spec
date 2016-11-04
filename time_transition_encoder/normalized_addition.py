@@ -16,9 +16,9 @@ class RandomAdditionTimeTransition:
             if a == 1 and b == 1:
                 transmitted_output.append(1)
             elif a ==1 and b == 0:  # Returning 1 gives good results
-                transmitted_output.append(1) #random.choice([0, 1])
+                transmitted_output.append(random.choice([0, 1])) #random.choice([0, 1])
             elif a == 0 and b == 1:
-                transmitted_output.append(0)
+                transmitted_output.append(random.choice([0, 1]))
             elif a == 0 and b == 0:
                 transmitted_output.append(0)
         return transmitted_output
