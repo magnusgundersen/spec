@@ -254,12 +254,15 @@ class ReservoirComputingFramework:
         """
 
         self.rc_helper.reset()
-
+        rc_outputs = []
         for _input, _output in training_data: # input and output at each timestep
             rc_output = self.rc_helper.run_input(_input)
+            rc_outputs.append(rc_output)
             # make training-set for the classifier:
             self.classifier_input_set.append(rc_output.flattened_states)
             self.classifier_output_set.append(_output)
+
+        return rc_outputs
 
 
 
@@ -267,7 +270,7 @@ class ReservoirComputingFramework:
     def train_classifier(self):
         print("Fitting classifier")
         print(len(self.classifier_input_set))
-        for _ in range(4):
+        for _ in range(1):
             self.classifier_input_set += self.classifier_input_set
             self.classifier_output_set += self.classifier_output_set
         print(len(self.classifier_input_set))

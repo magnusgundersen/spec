@@ -80,11 +80,13 @@ class RCCASystem:
         test_data = training_data[:]
 
 
-
+        self.example_data = None
         # Run each training-example through the rc-framework
         for training_example in training_data:
             #  We now have a timeseries of data, on which the rc-framework must be fitted
-            self.rc_framework.fit_to_data(training_example)
+            output = self.rc_framework.fit_to_data(training_example)
+            if self.example_data is None:
+                self.example_data = output
 
         self.rc_framework.train_classifier()
         print("done with training")
@@ -102,7 +104,8 @@ class RCCASystem:
 
 
 
-
+    def get_example_run(self):
+        return self.example_data
 
 
 class RCCAProblem:

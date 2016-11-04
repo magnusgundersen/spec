@@ -9,9 +9,9 @@ class CAVisualizer:
 
     def visualize(self, list_of_states):
         list_of_states = list_of_states[::-1]
-        print(list_of_states)
         width = len(list_of_states[0])
         gens = len(list_of_states)
+
         fig, ax = plt.subplots(figsize=(10, 10))
         ax.pcolormesh(list_of_states, cmap="Greys")
         ax.set_xlim(0, width)
@@ -19,6 +19,8 @@ class CAVisualizer:
         ax.set_title("CA")
         ax.set_axis_off()
         ax.set_aspect("equal")
+
+
         plt.show()
 
     def visualize_multiple_reservoirs(self, list_of_reservoirs):
