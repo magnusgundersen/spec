@@ -9,7 +9,7 @@ from reservoircomputing import rc_interface as interfaces
 class SVM(interfaces.RCClassifier):
     def __init__(self):
         super(SVM, self).__init__()
-        self.svm = svm.SVC()
+        self.svm = svm.LinearSVC()
         #self.svm = ridge.Ridge()
         #self.svm = neig.KNeighborsClassifier()
 

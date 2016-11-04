@@ -6,6 +6,7 @@ class RandomMappingEncoder(rcif.RCEncoder):
     def __init__(self):
         super().__init__()
         self.R = 1
+        self.C = 4
         self.encoding_scheme = "separate"
 
     def create_mappings(self, input_length):
@@ -17,12 +18,23 @@ class RandomMappingEncoder(rcif.RCEncoder):
         print("Creating mappings!")
         list_of_mappings = []
         self.input_length = input_length
-        num_list = [x for x in range(input_length)]
+        num_list = [x for x in range(input_length*self.C)]
         num_list2 = num_list[:]
 
         for _ in range(self.R):
             random.shuffle(num_list2)
-            list_of_mappings.append(num_list2[:])
+            list_of_mappings.append(num_list2[:self.input_length])
+
+        # EXPERIMENTAL: PADDING
+        """
+        for i in range(len(list_of_mappings)):
+            new_list = []
+            for j in range(len(list_of_mappings[i])):
+                new_list.extend([list_of_mappings[i][j],0])
+            list_of_mappings[i] = new_list
+            if i ==0:
+                print(new_list)
+        """
         self.mappings = list_of_mappings
 
 
@@ -37,12 +49,11 @@ class RandomMappingEncoder(rcif.RCEncoder):
             raise ValueError("Wrong input-length to encoder!")
 
         for i in range(self.R):
-            temp_enc_list = [0 for _ in range(len(_input))]
+            temp_enc_list = [0 for _ in range(len(_input)*self.C)]
             for j in range(len(_input)):
-                temp_enc_list[j] = _input[self.mappings[i][j]]
+                temp_enc_list[self.mappings[i][j]] = _input[j]
 
             encoded_input.append(temp_enc_list)
-
         return encoded_input
 
 

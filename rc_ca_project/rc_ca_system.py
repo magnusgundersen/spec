@@ -11,6 +11,7 @@ from reservoircomputing import rc as rc
 from reservoircomputing import rc_interface as rc_if
 from encoder import rnd_mapping as rnd_map
 from time_transition_encoder import normalized_addition as norm_add
+from time_transition_encoder import random_permutation as rnd_perm
 
 
 class RCCASystem:
@@ -73,8 +74,11 @@ class RCCASystem:
             raise ValueError("No RCCAProblem set!")
 
         # divide training_data:
-        training_data = self.rcca_problem.training_data[:int(len(self.rcca_problem.training_data)*(1-test_set_size))]
-        test_data = self.rcca_problem.training_data[int(len(self.rcca_problem.training_data)*(1-test_set_size)):]
+        #training_data = self.rcca_problem.training_data[:int(len(self.rcca_problem.training_data)*(1-test_set_size))]
+        #test_data = self.rcca_problem.training_data[int(len(self.rcca_problem.training_data)*(1-test_set_size)):]
+        training_data = self.rcca_problem.training_data[:]
+        test_data = training_data[:]
+
 
 
         # Run each training-example through the rc-framework
@@ -209,6 +213,9 @@ class RCCAConfig(rc_if.ExternalRCConfig):
         self.I = I
         if time_transition=="normalized_addition":
             self.time_transition = norm_add.RandomAdditionTimeTransition()
+        elif time_transition == "random_permutation":
+            self.time_transition = rnd_perm.RandomPermutationTransition()
+
 
 
 
