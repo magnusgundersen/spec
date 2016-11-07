@@ -6,7 +6,7 @@ class RandomMappingEncoder(rcif.RCEncoder):
     def __init__(self):
         super().__init__()
         self.R = 1
-        self.C = 3
+        self.C = 1
         self.encoding_scheme = "separate"
 
     def create_mappings(self, input_length):

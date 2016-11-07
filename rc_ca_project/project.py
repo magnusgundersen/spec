@@ -23,11 +23,11 @@ class Project:
     def n_bit_task(self, n=5):
 
 
-        n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_1000_dist_32")
+        n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_15_dist_32")
         random.shuffle(n_bit_data)
         rcca_problem = rcca.RCCAProblem(n_bit_data)
         rcca_config = rcca.RCCAConfig()
-        rcca_config.set_single_reservoir_config(ca_rule=90, R=16, I=9, classifier="linear-svm",
+        rcca_config.set_single_reservoir_config(ca_rule=90, R=16, C=3, I=9, classifier="linear-svm",
                                                 encoding="random_mapping", time_transition="random_permutation")
 
 
@@ -42,6 +42,7 @@ class Project:
 
         rcca_system.fit_to_problem(test_set_size=0.1)
 
+        # Visualize:
         outputs = rcca_system.get_example_run()
         whole_output = []
         lists_of_states = [output.list_of_states for output in outputs]
@@ -49,8 +50,7 @@ class Project:
             width = len(output[0])
             whole_output.extend(output)
             whole_output.extend([[-1 for _ in range(width)]])
-
-        #self.visualise_example(whole_output)
+        self.visualise_example(whole_output)
 
 
     def majority_task(self):
@@ -60,8 +60,10 @@ class Project:
 
         rcca_problem = rcca.RCCAProblem(majority_data)
         rcca_config = rcca.RCCAConfig()
-        rcca_config.set_single_reservoir_config(ca_rule=110, R=16, I=8, classifier="linear-svm",
+        rcca_config.set_single_reservoir_config(ca_rule=110, R=16, C=3, I=8, classifier="linear-svm",
                                                 encoding="random_mapping", time_transition="normalized_addition")
+
+        rcca_config.set_parallel_reservoir_config()
 
         rcca_system = rcca.RCCASystem()
 

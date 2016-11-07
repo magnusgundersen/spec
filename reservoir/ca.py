@@ -8,9 +8,14 @@ class ElemCAReservoir:
     def set_rule(self, rule_number):
         self.current_rule = Rule(rule_number)
 
+    def set_rules(self, rule_list):
+        self.parallel_reservoirs=True
+
     def run_simulation_step(self, prev_generation, rule):
         length = len(prev_generation)
         next_generation = []
+
+
 
         #Wrap around
         for i in range(length):

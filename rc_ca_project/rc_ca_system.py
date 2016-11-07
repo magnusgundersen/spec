@@ -198,7 +198,7 @@ class RCCAConfig(rc_if.ExternalRCConfig):
         self.time_transition = None
         self.parallellizer = None
 
-    def set_single_reservoir_config(self, ca_rule=105, R=4, I=12, classifier="linear-svm",
+    def set_single_reservoir_config(self, ca_rule=105, R=4, C=3, I=12, classifier="linear-svm",
                                     encoding="random_mapping", time_transition="normalized_addition"):
         # sets up elementary CA:
         self.reservoir = ca.ElemCAReservoir()
@@ -212,6 +212,7 @@ class RCCAConfig(rc_if.ExternalRCConfig):
         if encoding == "random_mapping":
             self.encoder = rnd_map.RandomMappingEncoder()
             self.encoder.R = R
+            self.encoder.C = C
 
         self.I = I
         if time_transition=="normalized_addition":
@@ -219,6 +220,28 @@ class RCCAConfig(rc_if.ExternalRCConfig):
         elif time_transition == "random_permutation":
             self.time_transition = rnd_perm.RandomPermutationTransition()
 
+    def set_parallel_reservoir_config(self, ca_rules=(105,110), parallel_scheme="concatenated", R=4, C=3, I=12, classifier="linear-svm",
+                                    encoding="random_mapping", time_transition="normalized_addition"):
+
+        # sets up elementary CA:
+        self.reservoir = ca.ElemCAReservoir()
+        self.reservoir.set_rule(ca_rule)
+
+        # clf
+        if classifier=="linear-svm":
+            self.classifier = svm.SVM()
+
+        # Encoder
+        if encoding == "random_mapping":
+            self.encoder = rnd_map.RandomMappingEncoder()
+            self.encoder.R = R
+            self.encoder.C = C
+
+        self.I = I
+        if time_transition=="normalized_addition":
+            self.time_transition = norm_add.RandomAdditionTimeTransition()
+        elif time_transition == "random_permutation":
+            self.time_transition = rnd_perm.RandomPermutationTransition()
 
 
 
