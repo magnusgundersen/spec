@@ -269,11 +269,9 @@ class ReservoirComputingFramework:
 
     def train_classifier(self):
         print("Fitting classifier")
-        print(len(self.classifier_input_set))
-        for _ in range(1):
+        for _ in range(0):
             self.classifier_input_set += self.classifier_input_set
             self.classifier_output_set += self.classifier_output_set
-        print(len(self.classifier_input_set))
         self.classifier.fit(self.classifier_input_set, self.classifier_output_set)
 
     def predict(self, test_data):
@@ -351,7 +349,7 @@ class RCHelper:
 
         # 4. step is to use transition to take previous steps into account
         if self.time_step > 0:  # No transition at first time step
-            transitioned_data = self.time_transition.join(self.last_step_data, encoded_input, self.encoder)
+            transitioned_data = self.time_transition.join(encoded_input, self.last_step_data, self.encoder)
         else:
             transitioned_data = encoded_input
 

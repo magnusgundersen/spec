@@ -28,24 +28,18 @@ def generate_n_bit_file(n, distractor_period, number_of_training_sets):
 
         # Distractor period
         for j in range(distractor_period):
-            first = random.choice([0,1])  #NB: Not sure if this is correct!
-            second = random.choice([0,1])
-            _input = str(first) + str(second) + "10"
+            _input = "0010"
             _output = "001"
             training_set += _input + " " + _output + "\n"
 
         # Cue signal
-        first = random.choice([0, 1])  # NB: Not sure if this is correct!
-        second = random.choice([0, 1])
-        _input = str(first) + str(second) + "01"
+        _input = "0001"
         _output = "001"
         training_set += _input + " " + _output + "\n"
 
         # repeated n bit signal
         for signal_entry in signal:
-            first = random.choice([0, 1])  # NB: Not sure if this is correct!
-            second = random.choice([0, 1])
-            _input = str(first) + str(second) + "10"
+            _input = "0010"
             _output = signal_entry
             training_set += _input + " " + _output + "\n"
 
@@ -60,6 +54,6 @@ def get_input_by_a1_value(a1_value):
         return "1000", "100"
     else:
         return "0100", "010"
-generate_n_bit_file(5, 202, 32)
+generate_n_bit_file(20, 200, 500)
 
 

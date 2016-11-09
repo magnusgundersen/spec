@@ -10,7 +10,7 @@ from reservoir import ca as ca
 from reservoircomputing import rc as rc
 from reservoircomputing import rc_interface as rc_if
 from encoder import rnd_mapping as rnd_map
-#from encoder import parallel as prl
+from encoder import parallel as prl
 from time_transition_encoder import normalized_addition as norm_add
 from time_transition_encoder import random_permutation as rnd_perm
 
@@ -75,10 +75,10 @@ class RCCASystem:
             raise ValueError("No RCCAProblem set!")
 
         # divide training_data:
-        training_data = self.rcca_problem.training_data[:int(len(self.rcca_problem.training_data)*(1-test_set_size))]
-        test_data = self.rcca_problem.training_data[int(len(self.rcca_problem.training_data)*(1-test_set_size)):]
-        #training_data = self.rcca_problem.training_data[:]
-        #test_data = training_data[:]
+        #training_data = self.rcca_problem.training_data[:int(len(self.rcca_problem.training_data)*(1-test_set_size))]
+        #test_data = self.rcca_problem.training_data[int(len(self.rcca_problem.training_data)*(1-test_set_size)):]
+        training_data = self.rcca_problem.training_data[10:]
+        test_data = training_data[:10]
 
 
         self.example_data = None

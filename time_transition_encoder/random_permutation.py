@@ -14,10 +14,11 @@ class RandomPermutationTransition:
         for i in range(len(mappings)):
             new_mapping = []
             for integer in mappings[i]:
-                new_mapping.append(integer+(i*8)) # 8 ni
+                new_mapping.append(integer+(i*(size//R))) # 8 ni
             adjusted_mappings.extend(new_mapping)
 
         new_input = ["x" for _ in range(size)]
+
         for index in adjusted_mappings:
             new_input[index] = _input[index]
         for i in range(len(new_input)):
