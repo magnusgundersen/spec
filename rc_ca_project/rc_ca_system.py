@@ -10,6 +10,7 @@ from reservoir import ca as ca
 from reservoircomputing import rc as rc
 from reservoircomputing import rc_interface as rc_if
 from encoder import rnd_mapping as rnd_map
+#from encoder import parallel as prl
 from time_transition_encoder import normalized_addition as norm_add
 from time_transition_encoder import random_permutation as rnd_perm
 
@@ -74,10 +75,10 @@ class RCCASystem:
             raise ValueError("No RCCAProblem set!")
 
         # divide training_data:
-        #training_data = self.rcca_problem.training_data[:int(len(self.rcca_problem.training_data)*(1-test_set_size))]
-        #test_data = self.rcca_problem.training_data[int(len(self.rcca_problem.training_data)*(1-test_set_size)):]
-        training_data = self.rcca_problem.training_data[:]
-        test_data = training_data[:]
+        training_data = self.rcca_problem.training_data[:int(len(self.rcca_problem.training_data)*(1-test_set_size))]
+        test_data = self.rcca_problem.training_data[int(len(self.rcca_problem.training_data)*(1-test_set_size)):]
+        #training_data = self.rcca_problem.training_data[:]
+        #test_data = training_data[:]
 
 
         self.example_data = None
@@ -220,12 +221,16 @@ class RCCAConfig(rc_if.ExternalRCConfig):
         elif time_transition == "random_permutation":
             self.time_transition = rnd_perm.RandomPermutationTransition()
 
-    def set_parallel_reservoir_config(self, ca_rules=(105,110), parallel_scheme="concatenated", R=4, C=3, I=12, classifier="linear-svm",
+    def set_parallel_reservoir_config(self, ca_rules=(105,110), parallel_size_policy="unbounded", R=4, C=3, I=12, classifier="linear-svm",
                                     encoding="random_mapping", time_transition="normalized_addition"):
 
         # sets up elementary CA:
         self.reservoir = ca.ElemCAReservoir()
-        self.reservoir.set_rule(ca_rule)
+        self.reservoir.set_rules(ca_rules)
+
+        #if parallel_size_policy
+        self.parallel_encoder = prl.ParallelNonUniformEncoder(ca_rules, parallel_size_policy)
+
 
         # clf
         if classifier=="linear-svm":

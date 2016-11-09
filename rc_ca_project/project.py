@@ -23,11 +23,11 @@ class Project:
     def n_bit_task(self, n=5):
 
 
-        n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_15_dist_32")
+        n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_16_dist_32")
         random.shuffle(n_bit_data)
         rcca_problem = rcca.RCCAProblem(n_bit_data)
         rcca_config = rcca.RCCAConfig()
-        rcca_config.set_single_reservoir_config(ca_rule=90, R=16, C=3, I=9, classifier="linear-svm",
+        rcca_config.set_single_reservoir_config(ca_rule=90, R=32, C=6, I=20, classifier="linear-svm",
                                                 encoding="random_mapping", time_transition="random_permutation")
 
 

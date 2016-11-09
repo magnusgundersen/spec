@@ -347,6 +347,8 @@ class RCHelper:
         # TODO: Remove this if you want to be able to have separate reservoirs!
         encoded_input = [val for sublist in encoded_inputs for val in sublist]
 
+        #encoded_input = self.parallelizer.encode(encoded_input)
+
         # 4. step is to use transition to take previous steps into account
         if self.time_step > 0:  # No transition at first time step
             transitioned_data = self.time_transition.join(self.last_step_data, encoded_input, self.encoder)

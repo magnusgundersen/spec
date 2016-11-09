@@ -11,18 +11,20 @@ class ElemCAReservoir:
     def set_rules(self, rule_list):
         self.parallel_reservoirs=True
 
-    def run_simulation_step(self, prev_generation, rule):
+
+
+    def run_simulation_step(self, prev_generation, rules):
         length = len(prev_generation)
         next_generation = []
-
-
-
         #Wrap around
         for i in range(length):
             left_index = (i-1) % length
             mid_index = i
             right_index = (i+1) % length
-            next_generation.append(rule.getOutput([prev_generation[left_index],
+            for start_index, end_index in rules.keys():
+                if start_index <= i <= end_index:
+                    rule = rules[(start_index, end_index)]
+                    next_generation.append(rule.getOutput([prev_generation[left_index],
                                                   prev_generation[mid_index], prev_generation[right_index]]))
         return next_generation
 
@@ -38,8 +40,13 @@ class ElemCAReservoir:
         """
         all_generations = [initial_inputs]
         current_generation = all_generations[0]
+        rule_dict = {(0, len(initial_inputs)//2-1):self.current_rule,
+                     (len(initial_inputs)//2, len(initial_inputs)): Rule(90)}
+
         for i in range(iterations):
-            current_generation = self.run_simulation_step(current_generation, self.current_rule)
+            # TODO: Parlallizaation scheme
+
+            current_generation = self.run_simulation_step(current_generation, rule_dict)
             all_generations.append(current_generation)
         return all_generations
 
