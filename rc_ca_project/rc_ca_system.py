@@ -77,8 +77,8 @@ class RCCASystem:
         # divide training_data:
         #training_data = self.rcca_problem.training_data[:int(len(self.rcca_problem.training_data)*(1-test_set_size))]
         #test_data = self.rcca_problem.training_data[int(len(self.rcca_problem.training_data)*(1-test_set_size)):]
-        training_data = self.rcca_problem.training_data[10:]
-        test_data = training_data[:10]
+        training_data = self.rcca_problem.training_data[:]
+        test_data = training_data[:]
 
 
         self.example_data = None
@@ -197,7 +197,7 @@ class RCCAConfig(rc_if.ExternalRCConfig):
         self.classifier = None
         self.encoder = None
         self.time_transition = None
-        self.parallellizer = None
+        self.parallelizer = None
 
     def set_single_reservoir_config(self, ca_rule=105, R=4, C=3, I=12, classifier="linear-svm",
                                     encoding="random_mapping", time_transition="normalized_addition"):
@@ -221,15 +221,16 @@ class RCCAConfig(rc_if.ExternalRCConfig):
         elif time_transition == "random_permutation":
             self.time_transition = rnd_perm.RandomPermutationTransition()
 
-    def set_parallel_reservoir_config(self, ca_rules=(105,110), parallel_size_policy="unbounded", R=4, C=3, I=12, classifier="linear-svm",
-                                    encoding="random_mapping", time_transition="normalized_addition"):
+    def set_parallel_reservoir_config(self, ca_rules=(105,110), parallel_size_policy="unbounded", R=4, C=3, I=12,
+                                      classifier="linear-svm", encoding="random_mapping",
+                                      time_transition="normalized_addition"):
 
         # sets up elementary CA:
         self.reservoir = ca.ElemCAReservoir()
         self.reservoir.set_rules(ca_rules)
 
         #if parallel_size_policy
-        self.parallel_encoder = prl.ParallelNonUniformEncoder(ca_rules, parallel_size_policy)
+        self.parallelizer = prl.ParallelNonUniformEncoder(self.reservoir.rules, parallel_size_policy)
 
 
         # clf
@@ -238,7 +239,7 @@ class RCCAConfig(rc_if.ExternalRCConfig):
 
         # Encoder
         if encoding == "random_mapping":
-            self.encoder = rnd_map.RandomMappingEncoder()
+            self.encoder = rnd_map.RandomMappingEncoder(self.parallelizer)
             self.encoder.R = R
             self.encoder.C = C
 

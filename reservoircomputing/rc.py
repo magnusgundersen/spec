@@ -6,6 +6,7 @@ The classifier and reservoir must implement the interfaces as described by the r
 import numpy as np
 import random
 import warnings
+
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
@@ -327,6 +328,7 @@ class RCHelper:
         self.time_transition = self.config.time_transition
         self.reservoir = self.config.reservoir
         self.I = self.config.I
+        self.parallelizer = self.config.parallelizer
 
 
     def reset(self):
@@ -345,7 +347,7 @@ class RCHelper:
         # TODO: Remove this if you want to be able to have separate reservoirs!
         encoded_input = [val for sublist in encoded_inputs for val in sublist]
 
-        #encoded_input = self.parallelizer.encode(encoded_input)
+        encoded_input, rule_dict = self.parallelizer.encode(encoded_input)
 
         # 4. step is to use transition to take previous steps into account
         if self.time_step > 0:  # No transition at first time step
@@ -356,7 +358,7 @@ class RCHelper:
           # ajour
 
         # 5. step is to propagate in CA reservoir
-        all_propagated_data = self.reservoir.run_simulation(transitioned_data, self.I)
+        all_propagated_data = self.reservoir.run_simulation(transitioned_data, self.I,  rule_dict)
         self.last_step_data = all_propagated_data[-1]
 
         # 6. step is to create an output-object

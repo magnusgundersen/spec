@@ -3,10 +3,11 @@ import random
 
 
 class RandomMappingEncoder(rcif.RCEncoder):
-    def __init__(self):
+    def __init__(self, parallelizer):
         super().__init__()
         self.R = 1
         self.C = 1
+        self.P = parallelizer.P
         self.encoding_scheme = "separate"
 
     def create_mappings(self, input_length):
@@ -54,6 +55,9 @@ class RandomMappingEncoder(rcif.RCEncoder):
                 temp_enc_list[self.mappings[i][j]] = _input[j]
 
             encoded_input.append(temp_enc_list)
+
+        for _ in range(self.P):
+            encoded_input += encoded_input
         return encoded_input
 
 

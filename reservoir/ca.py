@@ -3,13 +3,26 @@ import pprint
 
 class ElemCAReservoir:
     def __init__(self):
-        self.current_rule = None
+        self.rules = []
+
 
     def set_rule(self, rule_number):
-        self.current_rule = Rule(rule_number)
+        self.rules = Rule(rule_number)
 
     def set_rules(self, rule_list):
         self.parallel_reservoirs=True
+        for rule in rule_list:
+            self.rules.append(Rule(rule))
+
+    def set_rule_dict(self, rule_dict):
+        """
+
+        :param intervals:
+        :return:
+        """
+
+
+        self.rule_dict = rule_dict
 
 
 
@@ -22,14 +35,14 @@ class ElemCAReservoir:
             mid_index = i
             right_index = (i+1) % length
             for start_index, end_index in rules.keys():
-                if start_index <= i <= end_index:
+                if start_index <= i <= end_index:  # Get the rule at the current interval
                     rule = rules[(start_index, end_index)]
                     next_generation.append(rule.getOutput([prev_generation[left_index],
                                                   prev_generation[mid_index], prev_generation[right_index]]))
         return next_generation
 
 
-    def run_simulation(self, initial_inputs, iterations):
+    def run_simulation(self, initial_inputs, iterations, rule_dict):
         """
         Runs a simulation of the initial input, for a given iterations
 
@@ -40,8 +53,8 @@ class ElemCAReservoir:
         """
         all_generations = [initial_inputs]
         current_generation = all_generations[0]
-        rule_dict = {(0, len(initial_inputs)//2-1):self.current_rule,
-                     (len(initial_inputs)//2, len(initial_inputs)): Rule(90)}
+        #rule_dict = {(0, len(initial_inputs)//2-1):self.current_rule,
+        #             (len(initial_inputs)//2, len(initial_inputs)): Rule(90)}
 
         for i in range(iterations):
             # TODO: Parlallizaation scheme

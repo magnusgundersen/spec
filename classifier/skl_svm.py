@@ -16,6 +16,9 @@ class SVM(interfaces.RCClassifier):
     def fit(self, training_input, correct_predictions):
         #print("[SVM] " + str(training_input[:100]))
         #print("[SVM] " + str(correct_predictions[:100]))
+        #print(training_input)
+        for i in range(len(training_input)):
+            print(len(training_input[i]))
         return self.svm.fit(training_input, correct_predictions)
 
     def predict(self, reservoir_outputs):
