@@ -26,6 +26,7 @@ def main():
 
     #print(p.majority_task())
     print(p.n_bit_task())
+    #print(p.run_bye_experiements())
 
 
 if __name__ == "__main__":

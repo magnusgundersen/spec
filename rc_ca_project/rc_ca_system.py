@@ -66,7 +66,7 @@ class RCCASystem:
 
 
 
-    def fit_to_problem(self, test_set_size=0.1):
+    def fit_to_problem(self, validation_set_size=0.1):
         """
 
         :return:
@@ -75,8 +75,8 @@ class RCCASystem:
             raise ValueError("No RCCAProblem set!")
 
         # divide training_data:
-        #training_data = self.rcca_problem.training_data[:int(len(self.rcca_problem.training_data)*(1-test_set_size))]
-        #test_data = self.rcca_problem.training_data[int(len(self.rcca_problem.training_data)*(1-test_set_size)):]
+        #training_data = self.rcca_problem.training_data[:int(len(self.rcca_problem.training_data)*(1-validation_set_size))]
+        #test_data = self.rcca_problem.training_data[int(len(self.rcca_problem.training_data)*(1-validation_set_size)):]
         training_data = self.rcca_problem.training_data[:]
         test_data = training_data[:]
 
@@ -97,11 +97,18 @@ class RCCASystem:
             #  We now have a timeseries of data, on which the rc-framework must be fitted
             outputs = self.rc_framework.predict(test_ex)
             pointer = 0
+            all_correct = True
             for _, output in test_ex:
-                if output == outputs[pointer]:
-                    number_of_correct += 1
+                if output != outputs[pointer]:
+                    #print("WRONG: " + str(output) + str( "  ") + str(outputs[pointer]))
+                    all_correct = False
+                pointer += 1
+            if all_correct:
+                number_of_correct += 1
 
-        print("Number of correct: " + str(number_of_correct) +" of " + str(len(test_data)))
+        #print("Number of correct: " + str(number_of_correct) +" of " + str(len(test_data)))
+
+        return number_of_correct, len(test_data)
 
 
 
@@ -203,7 +210,10 @@ class RCCAConfig(rc_if.ExternalRCConfig):
                                     encoding="random_mapping", time_transition="normalized_addition"):
         # sets up elementary CA:
         self.reservoir = ca.ElemCAReservoir()
-        self.reservoir.set_rule(ca_rule)
+        ca_rule = [ca_rule]  # Parallel?
+        self.reservoir.set_rules(ca_rule)
+
+        self.parallelizer = prl.ParallelNonUniformEncoder(self.reservoir.rules, "unbounded")
 
         # clf
         if classifier=="linear-svm":
@@ -211,7 +221,7 @@ class RCCAConfig(rc_if.ExternalRCConfig):
 
         # Encoder
         if encoding == "random_mapping":
-            self.encoder = rnd_map.RandomMappingEncoder()
+            self.encoder = rnd_map.RandomMappingEncoder(self.parallelizer)
             self.encoder.R = R
             self.encoder.C = C
 

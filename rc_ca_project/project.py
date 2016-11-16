@@ -20,6 +20,53 @@ class Project:
     def __init__(self):
         pass
 
+    def run_bye_experiements(self):
+        rules = [n for n in range(256)]
+        rules = [90,150]  # wuixcc
+        Is_and_Rs = [(2,4),(2,8),(4,4),(4,8)]
+
+        n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_200_dist_32")
+        random.shuffle(n_bit_data)
+
+        ## Save:
+        headline = "Rule\t\tI=2,R=4\t\tI=2,R=8\t\tI=4,R=4\t\tI=4,R=8\n"
+
+
+        results = ""
+        for rule in rules:
+            rule_results = []
+            for I, R in Is_and_Rs:
+                successful_runs = 0
+                total_runs = 1
+
+                for i in range(total_runs):
+                    rcca_problem = rcca.RCCAProblem(n_bit_data)
+                    rcca_config = rcca.RCCAConfig()
+                    rcca_config.set_single_reservoir_config(ca_rule=rule, R=R, C=2, I=I, classifier="linear-svm",
+                                                            encoding="random_mapping", time_transition="random_permutation")
+                    rcca_system = rcca.RCCASystem()
+
+                    rcca_system.set_problem(rcca_problem)
+                    rcca_system.set_config(rcca_config)
+                    rcca_system.initialize_rc()
+
+                    correct, total = rcca_system.fit_to_problem(validation_set_size=0.1)
+
+                    if correct == total:
+                        successful_runs += 1
+
+                print("successful: " + str(successful_runs) +" of 10")
+                percentage_success = (successful_runs/total_runs)*100
+                round(percentage_success,1)  # 43.6
+                rule_results.append(percentage_success)
+            results += (str(rule)+"\t\t"+str(rule_results[0])+"\t\t"+str(rule_results[1])
+                           + "\t\t"+str(rule_results[2])+"\t\t"+str(rule_results[3])+"\n")
+
+        output = headline + results
+        print(output)
+
+        with open("bye_results.txt", 'w+') as f:
+            f.write(output)
     def n_bit_task(self, n=5):
 
 
@@ -27,11 +74,11 @@ class Project:
         random.shuffle(n_bit_data)
         rcca_problem = rcca.RCCAProblem(n_bit_data)
         rcca_config = rcca.RCCAConfig()
-        #rcca_config.set_single_reservoir_config(ca_rule=90, R=16, C=3, I=9, classifier="linear-svm",
+        #rcca_config.set_single_reservoir_config(ca_rule=90, R=1, C=5, I=1, classifier="linear-svm",
         #                                        encoding="random_mapping", time_transition="random_permutation")
-        rcca_config.set_parallel_reservoir_config(ca_rules=(25, 90, 44), parallel_size_policy="unbounded", R=4, C=4, I=4,
+        rcca_config.set_parallel_reservoir_config(ca_rules=[90,110], parallel_size_policy="bounded", R=4, C=4, I=4,
                                       classifier="linear-svm", encoding="random_mapping",
-                                      time_transition="normalized_addition")
+                                      time_transition="random_permutation")
 
         rcca_system = rcca.RCCASystem()
 
@@ -42,7 +89,7 @@ class Project:
         rcca_system.set_config(rcca_config)
         rcca_system.initialize_rc()
 
-        rcca_system.fit_to_problem(test_set_size=0.1)
+        rcca_system.fit_to_problem(validation_set_size=0.1)
 
         # Visualize:
         outputs = rcca_system.get_example_run()
@@ -73,7 +120,7 @@ class Project:
         rcca_system.set_config(rcca_config)
         rcca_system.initialize_rc()
 
-        rcca_system.fit_to_problem(test_set_size=0.1)
+        rcca_system.fit_to_problem(validation_set_size=0.1)
 
 
 

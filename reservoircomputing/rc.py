@@ -117,69 +117,9 @@ class ReservoirComputingFramework:
         self.classifier.fit(reservoir_outputs,classifier_outputs)
         print("Finished fitting the classifier")
 
-    def normalized_adding(self, transmission_input, _input):
-        # TODO: REMOVE FROM this class
-        transmitted_output = []
-        for i in range(len(transmission_input)):
-            a = transmission_input[i]
-            b = _input[i]
-            print("A and B: " + str(a) + " " + str(b))
-            if a == 1 and b ==1:
-                transmitted_output.append(1)
-            elif a ==1 and b ==0:
-                transmitted_output.append(random.choice([0, 1]))
-            elif a == 0 and b == 1:
-                transmitted_output.append(random.choice([0, 1]))
-            elif a == 0 and b ==0:
-                transmitted_output.append(0)
-        return transmitted_output
 
 
 
-    def fit_to_temporal_training_set(self, training_set, iterations, transmission_scheme="adding"):
-        """
-        Fits the trainer to the temporal data
-
-        transmission scheme
-
-        :param training_set:
-        :param iterations:
-        :param transmission_scheme:
-        :return:
-        """
-        transmission_input = [[train_tuple[0] for _ in range(self.encoder.R)] for train_tuple in training_set[0]]  # Initializes the transmission inputs
-        print("Transmission_input: " + str(transmission_input))
-        classifier_outputs = []
-        timestep_reservoir_outputs = []
-        for i in range(len(training_set)):
-            for _input, _output in training_set[i]:
-                if i > 0:
-                    _input = self.normalized_adding(transmission_input[i-1], _input)
-                    # MAJOR PROBLEM: This style of encoding encodes R times each timstep
-                    # The same encoding must following in time
-
-                reservoir_output = self.encode_and_execute(_input, iterations)  # This is a list of lists
-
-                transmission_input.append([reservoir_output[j][-1] for j in range(len(reservoir_output))])  # append the last state to norm. add the next gen
-                timestep_reservoir_outputs.append(self.encoder.encode_output(reservoir_output))  # Flatten
-
-                classifier_outputs.append(_output)
-
-
-
-        flattened_outputs = []
-        for output in timestep_reservoir_outputs:
-            # Flatten
-            new_output = [ca_val for sublist in output for ca_val in sublist]
-            flattened_outputs.append(new_output)
-        print("-----")
-        print("Flattened output to train the calssifier:")
-        print(len(flattened_outputs))
-        print(flattened_outputs[0])
-        print("-")
-
-
-        self.classifier.fit(flattened_outputs, classifier_outputs)
 
 
     def predict_old(self, _input, iterations):
@@ -311,10 +251,10 @@ class ReservoirComputingFramework:
             # HACK
             #print("Correct class: " + str(_output))
             #print("predicted cls: " + str(classifier_prediction))
-            print("Correct: "+ str(_output) +"     Prediction"+ str(classifier_prediction))
+            #print("Correct: "+ str(_output) +"     Prediction"+ str(classifier_prediction))
             if _output == classifier_prediction[0]:
                 number_of_correct += 1
-        print("number: " + str(number_of_correct) + " of "+str(len(test_data)))
+        #print("number: " + str(number_of_correct) + " of "+str(len(test_data)))
         return _outputs
 
 
