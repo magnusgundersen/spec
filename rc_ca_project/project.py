@@ -9,6 +9,25 @@ import random
 import pprint
 import itertools # for permutations
 
+from multiprocessing import Pool
+
+def run_exec(n_bit_data, rule, R, I):
+    rcca_problem = rcca.RCCAProblem(n_bit_data)
+    rcca_config = rcca.RCCAConfig()
+    rcca_config.set_single_reservoir_config(ca_rule=rule, R=R, C=10, I=I, classifier="linear-svm",
+                                            encoding="random_mapping",
+                                            time_transition="random_permutation")
+    rcca_system = rcca.RCCASystem()
+
+    rcca_system.set_problem(rcca_problem)
+    rcca_system.set_config(rcca_config)
+    rcca_system.initialize_rc()
+
+    correct, total = rcca_system.fit_to_problem(validation_set_size=0.1)
+    if correct == total:
+        return 1
+    return 0
+
 class Project:
     """
     Contains all tasks and functionality specifically to the specialization project.
@@ -22,7 +41,7 @@ class Project:
 
     def run_bye_experiements(self):
         rules = [n for n in range(256)]
-        rules = [90,150]  # wuixcc
+        rules = [90, 110, 182]  # wuixcc
         Is_and_Rs = [(2,4),(2,8),(4,4),(4,8)]
 
         n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_200_dist_32")
@@ -37,13 +56,16 @@ class Project:
             rule_results = []
             for I, R in Is_and_Rs:
                 successful_runs = 0
-                total_runs = 1
+                total_runs = 100
+                results_from_runs = []
 
-                for i in range(total_runs):
+                """
+                def run():
                     rcca_problem = rcca.RCCAProblem(n_bit_data)
                     rcca_config = rcca.RCCAConfig()
-                    rcca_config.set_single_reservoir_config(ca_rule=rule, R=R, C=2, I=I, classifier="linear-svm",
-                                                            encoding="random_mapping", time_transition="random_permutation")
+                    rcca_config.set_single_reservoir_config(ca_rule=rule, R=R, C=10, I=I, classifier="linear-svm",
+                                                            encoding="random_mapping",
+                                                            time_transition="random_permutation")
                     rcca_system = rcca.RCCASystem()
 
                     rcca_system.set_problem(rcca_problem)
@@ -53,14 +75,30 @@ class Project:
                     correct, total = rcca_system.fit_to_problem(validation_set_size=0.1)
 
                     if correct == total:
-                        successful_runs += 1
+                        return 1
+                    return 0
+                #for i in range(total_runs):
+                #    results_from_runs.append(run())
 
-                print("successful: " + str(successful_runs) +" of 10")
+                """
+                with Pool(7) as p:
+                    results_from_runs= p.starmap(run_exec, [(n_bit_data,rule, I, R) for _ in range(total_runs)])
+
+
+                print(results_from_runs)
+                successful_runs = results_from_runs.count(1)
+
+                print("successful: " + str(successful_runs) + " of " + str(len(results_from_runs)))
                 percentage_success = (successful_runs/total_runs)*100
                 round(percentage_success,1)  # 43.6
                 rule_results.append(percentage_success)
-            results += (str(rule)+"\t\t"+str(rule_results[0])+"\t\t"+str(rule_results[1])
-                           + "\t\t"+str(rule_results[2])+"\t\t"+str(rule_results[3])+"\n")
+            rule_result = (str(rule)+"\t\t"+str(rule_results[0])+"\t\t"+str(rule_results[1])
+                           + "\t\t"+str(rule_results[2])+"\t\t"+str(rule_results[3]))
+            results += rule_result+"\n"
+
+            with open("bye_results_rule_" + str(rule) + ".txt", 'w+') as f:
+                temp_results = headline + rule_result
+                f.write(temp_results)
 
         output = headline + results
         print(output)
@@ -74,9 +112,9 @@ class Project:
         random.shuffle(n_bit_data)
         rcca_problem = rcca.RCCAProblem(n_bit_data)
         rcca_config = rcca.RCCAConfig()
-        #rcca_config.set_single_reservoir_config(ca_rule=90, R=1, C=5, I=1, classifier="linear-svm",
+        #rcca_config.set_single_reservoir_config(ca_rule=90, R=4, C=2, I=2, classifier="linear-svm",
         #                                        encoding="random_mapping", time_transition="random_permutation")
-        rcca_config.set_parallel_reservoir_config(ca_rules=[90,110], parallel_size_policy="bounded", R=4, C=4, I=4,
+        rcca_config.set_parallel_reservoir_config(ca_rules=[90,110], parallel_size_policy="bounded", R=4, C=10, I=4,
                                       classifier="linear-svm", encoding="random_mapping",
                                       time_transition="random_permutation")
 

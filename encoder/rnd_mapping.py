@@ -55,8 +55,8 @@ class RandomMappingEncoder(rcif.RCEncoder):
                 temp_enc_list[self.mappings[i][j]] = _input[j]
 
             encoded_input.append(temp_enc_list)
-
-        for _ in range(self.P):
+        #print(self.P)
+        for _ in range(self.P-1):
             encoded_input += encoded_input
         return encoded_input
 
