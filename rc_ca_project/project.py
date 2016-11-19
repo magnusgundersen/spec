@@ -41,7 +41,8 @@ class Project:
 
     def run_bye_experiements(self):
         rules = [n for n in range(256)]
-        rules = [90, 110, 182]  # wuixcc
+        rules = [60,90,102,105,150,153,165,180,195]  # Bye rules
+        rules = [22, 88]  # wuixcc
         Is_and_Rs = [(2,4),(2,8),(4,4),(4,8)]
 
         n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_200_dist_32")
@@ -81,7 +82,7 @@ class Project:
                 #    results_from_runs.append(run())
 
                 """
-                with Pool(7) as p:
+                with Pool(3) as p:
                     results_from_runs= p.starmap(run_exec, [(n_bit_data,rule, I, R) for _ in range(total_runs)])
 
 
@@ -108,15 +109,15 @@ class Project:
     def n_bit_task(self, n=5):
 
 
-        n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_15_dist_32")
+        n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_200_dist_32")
         random.shuffle(n_bit_data)
         rcca_problem = rcca.RCCAProblem(n_bit_data)
         rcca_config = rcca.RCCAConfig()
-        #rcca_config.set_single_reservoir_config(ca_rule=90, R=4, C=2, I=2, classifier="linear-svm",
-        #                                        encoding="random_mapping", time_transition="random_permutation")
-        rcca_config.set_parallel_reservoir_config(ca_rules=[90,110], parallel_size_policy="bounded", R=4, C=10, I=4,
-                                      classifier="linear-svm", encoding="random_mapping",
-                                      time_transition="random_permutation")
+        rcca_config.set_single_reservoir_config(ca_rule=90, R=4, C=10, I=4, classifier="linear-svm",
+                                                encoding="random_mapping", time_transition="random_permutation")
+        #rcca_config.set_parallel_reservoir_config(ca_rules=[180,180], parallel_size_policy="bounded", R=4, C=10, I=4,
+        #                              classifier="linear-svm", encoding="random_mapping",
+        #                              time_transition="random_permutation")
 
         rcca_system = rcca.RCCASystem()
 
@@ -127,7 +128,7 @@ class Project:
         rcca_system.set_config(rcca_config)
         rcca_system.initialize_rc()
 
-        rcca_system.fit_to_problem(validation_set_size=0.1)
+        print(rcca_system.fit_to_problem(validation_set_size=0.1))
 
         # Visualize:
         outputs = rcca_system.get_example_run()
@@ -160,7 +161,11 @@ class Project:
 
         rcca_system.fit_to_problem(validation_set_size=0.1)
 
+    def run_mg_experiments(self):
+        """
 
+        :return:
+        """
 
     def visualise_example(self, training_array):
         visualizer = bviz.CAVisualizer()

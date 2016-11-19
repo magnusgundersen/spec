@@ -8,6 +8,7 @@ class RandomMappingEncoder(rcif.RCEncoder):
         self.R = 1
         self.C = 1
         self.P = parallelizer.P
+        self.parallel_size_policy = parallelizer.parallel_size_policy
         self.encoding_scheme = "separate"
 
     def create_mappings(self, input_length):
@@ -56,8 +57,10 @@ class RandomMappingEncoder(rcif.RCEncoder):
 
             encoded_input.append(temp_enc_list)
         #print(self.P)
-        for _ in range(self.P-1):
-            encoded_input += encoded_input
+
+        if self.parallel_size_policy == "unbounded":
+            for _ in range(self.P-1):
+                encoded_input += encoded_input
         return encoded_input
 
 

@@ -6,6 +6,7 @@ classifiers as chosen.
 """
 __author__ = 'magnus'
 from classifier import skl_svm as svm
+from classifier import tfl_ann as tflann
 from reservoir import ca as ca
 from reservoircomputing import rc as rc
 from reservoircomputing import rc_interface as rc_if
@@ -245,7 +246,8 @@ class RCCAConfig(rc_if.ExternalRCConfig):
 
         # clf
         if classifier=="linear-svm":
-            self.classifier = svm.SVM()
+            #self.classifier = svm.SVM()
+            self.classifier = tflann.ANN()
 
         # Encoder
         if encoding == "random_mapping":
