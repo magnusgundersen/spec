@@ -91,9 +91,9 @@ class RCCASystem:
                 self.example_data = output
 
         self.rc_framework.train_classifier()
-        print("done with training")
+        #print("done with training")
         number_of_correct = 0
-
+        """
         for test_ex in test_data:
             #  We now have a timeseries of data, on which the rc-framework must be fitted
             outputs = self.rc_framework.predict(test_ex)
@@ -108,13 +108,66 @@ class RCCASystem:
                 number_of_correct += 1
 
         #print("Number of correct: " + str(number_of_correct) +" of " + str(len(test_data)))
-
+        """
         return number_of_correct, len(test_data)
 
+    def test_on_problem(self, test_set_config=None):
+        """
 
+                :return:
+                """
+        if self.rcca_problem is None:
+            raise ValueError("No RCCAProblem set!")
+        rcca_output = RCCAOutput()
+        rcca_output.rcca_config = self.rcca_config
+
+
+        # divide training_data:
+        test_data = self.rcca_problem.training_data[:]
+        rcca_output.all_test_examples=test_data
+
+        number_of_correct = 0
+
+        for test_ex in test_data:
+            #  We now have a timeseries of data, on which the rc-framework must be fitted
+            outputs = self.rc_framework.predict(test_ex)
+            rcca_output.all_RCOutputs.append(outputs)
+            pointer = 0
+            all_correct = True
+            predictions = []
+            for _, output in test_ex:
+                predictions.append(outputs[pointer])
+                if output != outputs[pointer]:
+                    # print("WRONG: " + str(output) + str( "  ") + str(outputs[pointer]))
+                    all_correct = False
+                pointer += 1
+            rcca_output.all_predictions.append(predictions)
+
+            if all_correct:
+                number_of_correct += 1
+
+        # print("Number of correct: " + str(number_of_correct) +" of " + str(len(test_data)))
+        rcca_output.total_correct = number_of_correct
+        return rcca_output
 
     def get_example_run(self):
         return self.example_data
+
+class RCCAOutput:
+    def __init__(self):
+        self.all_RCOutputs = []  # Includes full iterations, transitioned and input
+        self.all_predictions = []
+        self.correct_predictions = []
+        self.all_test_examples = []
+        self.rcca_config = None
+        self.total_correct = 0
+
+    def was_successful(self):
+        if self.total_correct == len(self.all_test_examples):  # Success criteria
+            return True
+        return False
+
+
 
 
 class RCCAProblem:
@@ -219,6 +272,9 @@ class RCCAConfig(rc_if.ExternalRCConfig):
         # clf
         if classifier=="linear-svm":
             self.classifier = svm.SVM()
+        elif classifier =="tlf_ann":
+            self.classifier = tflann.ANN()
+
 
         # Encoder
         if encoding == "random_mapping":
@@ -246,7 +302,8 @@ class RCCAConfig(rc_if.ExternalRCConfig):
 
         # clf
         if classifier=="linear-svm":
-            #self.classifier = svm.SVM()
+            self.classifier = svm.SVM()
+        elif classifier =="tlf_ann":
             self.classifier = tflann.ANN()
 
         # Encoder

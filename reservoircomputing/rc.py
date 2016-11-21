@@ -210,9 +210,7 @@ class ReservoirComputingFramework:
 
     def train_classifier(self):
         print("Fitting classifier")
-        for _ in range(0):
-            self.classifier_input_set += self.classifier_input_set
-            self.classifier_output_set += self.classifier_output_set
+
         self.classifier.fit(self.classifier_input_set, self.classifier_output_set)
 
     def predict(self, test_data):
@@ -274,7 +272,7 @@ class RCHelper:
     def reset(self):
         self.time_step = 0
         self.previous_data = []
-        self.last_step_data = [] #ONLY FOR CONCAT RESERVOIRS!
+        self.last_step_data = []
 
     def run_input(self, _input):
         # Run input that is deptandant on previous inputs
@@ -299,11 +297,12 @@ class RCHelper:
 
         # 5. step is to propagate in CA reservoir
         all_propagated_data = self.reservoir.run_simulation(transitioned_data, self.I,  rule_dict)
+        previous_data = self.last_step_data[:]
         self.last_step_data = all_propagated_data[-1]
 
         # 6. step is to create an output-object
         output = RCOutput()
-        output.set_states(all_propagated_data, self.last_step_data)
+        output.set_states(all_propagated_data, previous_data)
 
         self.time_step += 1
 
