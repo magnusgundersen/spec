@@ -13,6 +13,8 @@ class RandomAdditionTimeTransition:
         for i in range(len(transmission_input)):
             a = transmission_input[i]
             b = _input[i]
+
+            # NB! Currently XOR!
             if a == 1 and b == 1:
                 transmitted_output.append(0)
             elif a ==1 and b == 0:  # Returning 1 gives good results

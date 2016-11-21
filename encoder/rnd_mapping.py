@@ -17,7 +17,7 @@ class RandomMappingEncoder(rcif.RCEncoder):
         :param input_length:
         :return:
         """
-        print("Creating mappings!")
+        #print("Creating mappings!")
         list_of_mappings = []
         self.input_length = input_length
         num_list = [x for x in range(input_length*self.C)]

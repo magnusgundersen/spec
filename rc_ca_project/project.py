@@ -11,6 +11,7 @@ import itertools # for permutations
 import csv
 import os
 import pickle as pickle
+import time
 
 from multiprocessing import Pool
 
@@ -47,10 +48,12 @@ class Project:
         pass
 
     def run_bye_experiements(self):
+        print("Running bye-experiments")
         rules = [n for n in range(256)]
         rules = [60,90,102,105,150,153,165,180,195]  # Bye rules
         #rules = [182, 90]  # wuixcc
         Is_and_Rs = [(2,4),(2,8),(4,4),(4,8)]
+        total_runs_per_config = 120
 
         n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_200_dist_32")
         random.shuffle(n_bit_data)
@@ -60,8 +63,11 @@ class Project:
 
 
         results = ""
+        before_time = time.time()
         for rule in rules:
+            print("Executing rule: " + str(rule))
             rule_results = []
+
             for I, R in Is_and_Rs:
                 rcca_problem = rcca.RCCAProblem(n_bit_data)
                 rcca_config = rcca.RCCAConfig()
@@ -70,10 +76,11 @@ class Project:
                                                         time_transition="random_permutation")
 
                 successful_runs = 0
-                total_runs = 7
 
-                with Pool(7) as p:
-                    results_from_runs = p.starmap(run_exec, [(n_bit_data,rule, rcca_problem, rcca_config) for _ in range(total_runs)])
+                with Pool(8) as p:
+                    results_from_runs = p.starmap(run_exec,
+                                                  [(n_bit_data,rule,
+                                                    rcca_problem, rcca_config) for _ in range(total_runs_per_config)])
 
                 csv_name = "rule_" + str(rule) + "_I" + str(I) + "R" + str(R)
                 path = os.getcwd()
@@ -86,17 +93,19 @@ class Project:
                 except OSError as exception:
                     pass
 
-                # Pickles dir
-                try:
-                    os.makedirs(path + r"pickles\\")
-                except OSError as exception:
-                    pass
 
 
-                # Dump pickles
-
-                i = 0
                 save_pickle = False
+                # Pickles dir
+                if save_pickle:
+                    try:
+                        os.makedirs(path + r"pickles\\")
+                    except OSError as exception:
+                        pass
+
+
+                # Dump pickles ++
+                i = 0
                 for run in results_from_runs:
                     # save pickle
                     if save_pickle:
@@ -109,16 +118,24 @@ class Project:
                 # csv
                 with open(path + csv_name+".csv", 'w+', newline='') as f:
                     writer = csv.writer(f, dialect='excel')
-                    #writer.writerow(["rule","correct"])
                     for run in results_from_runs:
                         writer.writerow([rule, run.total_correct])
 
                 #print("successful: " + str(successful_runs) + " of " + str(len(results_from_runs)))
-                percentage_success = (successful_runs/total_runs)*100
+                percentage_success = (successful_runs/total_runs_per_config)*100
                 percentage_success = round(percentage_success, 1)  # 43.6
                 rule_results.append(percentage_success)
-            rule_result = (str(rule)+"\t"+str(rule_results[0])+"\t\t"+str(rule_results[1])
-                           + "\t\t"+str(rule_results[2])+"\t\t"+str(rule_results[3]))
+
+            if results=="":
+                one_rule = (time.time()-before_time)
+                no_of_rules = len(rules)
+                total_time_estimated = no_of_rules*one_rule
+                print("Total estimated_time: " + str(int(total_time_estimated)) + " seconds")
+                print("In minutes: " + str(total_time_estimated//60))
+                print("In hours: " + str(total_time_estimated // 3600))
+
+            rule_result = (str(rule)+"\t\t"+str(rule_results[0])+"\t\t\t"+str(rule_results[1])
+                           + "\t\t\t"+str(rule_results[2])+"\t\t\t"+str(rule_results[3]))
             results += rule_result+"\n"
 
 
@@ -128,8 +145,9 @@ class Project:
 
         output = headline + results
         print(output)
+        print("total time used in seconds:" + str(time.time() - before_time))
 
-        with open("bye_results.txt", 'w+') as f:
+        with open(path + "..\\bye_results_summary.txt", 'w+') as f:
             f.write(output)
     def n_bit_task(self, n=5):
 

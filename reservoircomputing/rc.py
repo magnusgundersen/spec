@@ -113,9 +113,9 @@ class ReservoirComputingFramework:
             reservoir_outputs.append(encoded_output)
             classifier_outputs.append(_output)
 
-        print("Finished propagating")
+        #print("Finished propagating")
         self.classifier.fit(reservoir_outputs,classifier_outputs)
-        print("Finished fitting the classifier")
+        #print("Finished fitting the classifier")
 
 
 
@@ -209,7 +209,7 @@ class ReservoirComputingFramework:
 
 
     def train_classifier(self):
-        print("Fitting classifier")
+        #print("Fitting classifier")
 
         self.classifier.fit(self.classifier_input_set, self.classifier_output_set)
 
