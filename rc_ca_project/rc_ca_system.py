@@ -15,6 +15,8 @@ from encoder import parallel as prl
 from time_transition_encoder import normalized_addition as norm_add
 from time_transition_encoder import random_permutation as rnd_perm
 
+global t
+t=16 # FOR TRAINING SET SPLITTING! REMOVE
 
 class RCCASystem:
     """
@@ -67,7 +69,7 @@ class RCCASystem:
 
 
 
-    def fit_to_problem(self, validation_set_size=0.1):
+    def fit_to_problem(self, validation_set_size=0.5):
         """
 
         :return:
@@ -78,9 +80,10 @@ class RCCASystem:
         # divide training_data:
         #training_data = self.rcca_problem.training_data[:int(len(self.rcca_problem.training_data)*(1-validation_set_size))]
         #test_data = self.rcca_problem.training_data[int(len(self.rcca_problem.training_data)*(1-validation_set_size)):]
-        training_data = self.rcca_problem.training_data[:]
-        test_data = training_data[:]
 
+        training_data = self.rcca_problem.training_data[:int(len(self.rcca_problem.training_data)*validation_set_size)]
+        #print(str(len(self.rcca_problem.training_data)*validation_set_size))
+        #print("size training set: " + str(len(training_data)))
 
         self.example_data = None
         # Run each training-example through the rc-framework
@@ -109,9 +112,9 @@ class RCCASystem:
 
         #print("Number of correct: " + str(number_of_correct) +" of " + str(len(test_data)))
         """
-        return number_of_correct, len(test_data)
+        return 0, 0
 
-    def test_on_problem(self, test_set_config=None):
+    def test_on_problem(self, test_set_size=0.5):
         """
 
                 :return:
@@ -123,7 +126,7 @@ class RCCASystem:
 
 
         # divide training_data:
-        test_data = self.rcca_problem.training_data[:]
+        test_data = self.rcca_problem.training_data[int(len(self.rcca_problem.training_data)*test_set_size):]
         rcca_output.all_test_examples=test_data
 
         number_of_correct = 0
@@ -147,6 +150,7 @@ class RCCASystem:
                 number_of_correct += 1
 
         # print("Number of correct: " + str(number_of_correct) +" of " + str(len(test_data)))
+
         rcca_output.total_correct = number_of_correct
         return rcca_output
 

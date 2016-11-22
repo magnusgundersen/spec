@@ -24,14 +24,14 @@ def run_exec(n_bit_data, rule, rcca_problem, rcca_config):
     :param I:
     :return:
     """
-
+    portion_training_set = 0.5
     rcca_system = rcca.RCCASystem()
     rcca_system.set_problem(rcca_problem)
     rcca_system.set_config(rcca_config)
     rcca_system.initialize_rc()
 
-    _,_ = rcca_system.fit_to_problem()
-    rcca_output = rcca_system.test_on_problem()
+    _,_ = rcca_system.fit_to_problem(1)
+    rcca_output = rcca_system.test_on_problem(0)
 
 
     return rcca_output
@@ -53,9 +53,9 @@ class Project:
         rules = [60,90,102,105,150,153,165,180,195]  # Bye rules
         #rules = [182, 90]  # wuixcc
         Is_and_Rs = [(2,4),(2,8),(4,4),(4,8)]
-        total_runs_per_config = 120
+        total_runs_per_config = (8*8)
 
-        n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_200_dist_32")
+        n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_15_dist_32")
         random.shuffle(n_bit_data)
 
         ## Save:
@@ -119,7 +119,7 @@ class Project:
                 with open(path + csv_name+".csv", 'w+', newline='') as f:
                     writer = csv.writer(f, dialect='excel')
                     for run in results_from_runs:
-                        writer.writerow([rule, run.total_correct])
+                        writer.writerow([rule, run.total_correct, len(run.all_test_examples)])
 
                 #print("successful: " + str(successful_runs) + " of " + str(len(results_from_runs)))
                 percentage_success = (successful_runs/total_runs_per_config)*100
@@ -149,15 +149,237 @@ class Project:
 
         with open(path + "..\\bye_results_summary.txt", 'w+') as f:
             f.write(output)
+
+    def run_yil_experiment_IR(self):
+        print("Running Yilmaz-experiments")
+        rules = [n for n in range(256)]
+        rules = [22, 90, 150, 182]  # Yil rules
+
+        Is_and_Rs = [(8, 8), (8, 16), (8, 32), (8, 64),
+                     (16, 8), (16, 16), (16, 32), (16, 64),
+                     (32, 8), (32, 16), (32, 32), (32, 64)
+                     ]
+        total_runs_per_config = 8
+
+        n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_200_dist_32")
+        random.shuffle(n_bit_data)
+
+        ## Save:
+        headline = "Rule"
+        for I, R in Is_and_Rs:
+            headline += "\tI=" + str(I) + ",R=" + str(R)
+
+        headline += "\n"
+
+        results = ""
+        before_time = time.time()
+        for rule in rules:
+            print("Executing rule: " + str(rule))
+            rule_results = []
+
+            for I, R in Is_and_Rs:
+                rcca_problem = rcca.RCCAProblem(n_bit_data)
+                rcca_config = rcca.RCCAConfig()
+                rcca_config.set_single_reservoir_config(ca_rule=rule, R=R, C=1, I=I, classifier="linear-svm",
+                                                        encoding="random_mapping",
+                                                        time_transition="normalized_addition")
+
+                successful_runs = 0
+
+                with Pool(8) as p:
+                    results_from_runs = p.starmap(run_exec,
+                                                  [(n_bit_data, rule,
+                                                    rcca_problem, rcca_config) for _ in range(total_runs_per_config)])
+
+                csv_name = "rule_" + str(rule) + "_I" + str(I) + "R" + str(R)
+                path = os.getcwd()
+                path = path + r"\..\data\experiments_data\rule_" + str(rule) + "\\"  # raw string
+
+                # Rule directory
+                try:
+                    os.makedirs(path)
+                except OSError as exception:
+                    pass
+
+                save_pickle = False
+                # Pickles dir
+                if save_pickle:
+                    try:
+                        os.makedirs(path + r"pickles\\")
+                    except OSError as exception:
+                        pass
+
+                # Dump pickles ++
+                i = 0
+                for run in results_from_runs:
+                    # save pickle
+                    if save_pickle:
+                        with open(path + "pickles\\run_" + str(i) + ".pkl", 'wb') as output:
+                            pickle.dump(run.all_predictions, output, pickle.HIGHEST_PROTOCOL)
+                    if run.was_successful():
+                        successful_runs += 1
+                    i += 1
+
+                # csv
+                with open(path + csv_name + ".csv", 'w+', newline='') as f:
+                    writer = csv.writer(f, dialect='excel')
+                    for run in results_from_runs:
+                        writer.writerow([rule, run.total_correct])
+
+                # print("successful: " + str(successful_runs) + " of " + str(len(results_from_runs)))
+                percentage_success = (successful_runs / total_runs_per_config) * 100
+                percentage_success = round(percentage_success, 1)  # 43.6
+                rule_results.append(percentage_success)
+
+            if results == "":
+                one_rule = (time.time() - before_time)
+                no_of_rules = len(rules)
+                total_time_estimated = no_of_rules * one_rule
+                print("Total estimated_time: " + str(int(total_time_estimated)) + " seconds")
+                print("In minutes: " + str(total_time_estimated // 60))
+                print("In hours: " + str(total_time_estimated // 3600))
+
+
+            rule_result = str(rule)
+            for result in rule_results:
+                rule_result += "\t\t" + str(result)
+
+            results += rule_result + "\n"
+
+            with open(path + "rule_" + str(rule) + "_summary" + ".txt", 'w+') as f:
+                temp_results = headline + rule_result
+                f.write(temp_results)
+
+        output = headline + results
+        print(output)
+        print("total time used in seconds:" + str(time.time() - before_time))
+
+        with open(path + "..\\yilmaz_results_summary.txt", 'w+') as f:
+            f.write(output)
+    def run_yil_experiment_RNN_distractor(self):
+        print("Running Yilmaz-experiments with diff distractr")
+        rules = [n for n in range(256)]
+        rules = [90, 110, 150]  # Yil rules
+
+        Is_and_Rs = [
+                        (32, 8), (32, 10), (32, 12), (32, 14),
+                        (32, 16), (32, 18), (32, 20), (32, 22),
+                        (32, 24), (32, 26), (32, 28), (32, 30),
+                        (32, 35), (32, 40), (32, 45)
+
+                     ]
+        total_runs_per_config = 64
+
+        distractor_periods = [25,50,100,200]
+        for distractor_period in distractor_periods:
+            print("-------")
+            print("Started distractor period: " + str(distractor_period) + " at " + str(time.localtime().tm_hour) + ":" + str(time.localtime().tm_min))
+            n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_"+str(distractor_period)+"_dist_32")
+            random.shuffle(n_bit_data)
+
+            ## Save:
+            headline = "Rule"
+            for I, R in Is_and_Rs:
+                headline += "\tI=" + str(I) + ",R=" + str(R)
+
+            headline += "\n"
+
+            results = ""
+            before_time = time.time()
+            for rule in rules:
+                print("Executing rule: " + str(rule))
+                rule_results = []
+
+                for I, R in Is_and_Rs:
+                    rcca_problem = rcca.RCCAProblem(n_bit_data)
+                    rcca_config = rcca.RCCAConfig()
+                    rcca_config.set_single_reservoir_config(ca_rule=rule, R=R, C=1, I=I, classifier="linear-svm",
+                                                            encoding="random_mapping",
+                                                            time_transition="normalized_addition")
+
+                    successful_runs = 0
+
+                    with Pool(8) as p:
+                        results_from_runs = p.starmap(run_exec,
+                                                      [(n_bit_data, rule,
+                                                        rcca_problem, rcca_config) for _ in range(total_runs_per_config)])
+
+                    csv_name = "rule_" + str(rule) + "_I" + str(I) + "R" + str(R)
+                    path = os.getcwd()
+                    path = path + r"\..\data\experiments_data\d_"+str(distractor_period)+"_rule_" + str(rule) + "\\"  # raw string
+
+                    # Rule directory
+                    try:
+                        os.makedirs(path)
+                    except OSError as exception:
+                        pass
+
+                    save_pickle = False
+                    # Pickles dir
+                    if save_pickle:
+                        try:
+                            os.makedirs(path + r"pickles\\")
+                        except OSError as exception:
+                            pass
+
+                    # Dump pickles ++
+                    i = 0
+                    for run in results_from_runs:
+                        # save pickle
+                        if save_pickle:
+                            with open(path + "pickles\\run_" + str(i) + ".pkl", 'wb') as output:
+                                pickle.dump(run.all_predictions, output, pickle.HIGHEST_PROTOCOL)
+                        if run.was_successful():
+                            successful_runs += 1
+                        i += 1
+
+                    # csv
+                    with open(path + csv_name + ".csv", 'w+', newline='') as f:
+                        writer = csv.writer(f, dialect='excel')
+                        for run in results_from_runs:
+                            writer.writerow([rule, run.total_correct])
+
+                    # print("successful: " + str(successful_runs) + " of " + str(len(results_from_runs)))
+                    percentage_success = (successful_runs / total_runs_per_config) * 100
+                    percentage_success = round(percentage_success, 1)  # 43.6
+                    rule_results.append(percentage_success)
+
+                if results == "":
+                    one_rule = (time.time() - before_time)
+                    no_of_rules = len(rules)
+                    total_time_estimated = no_of_rules * one_rule*len(distractor_periods)
+                    print("Total estimated_time: " + str(int(total_time_estimated)) + " seconds")
+                    print("In minutes: " + str(total_time_estimated // 60))
+                    print("In hours: " + str(total_time_estimated // 3600))
+
+
+                rule_result = str(rule)
+                for result in rule_results:
+                    rule_result += "\t\t" + str(result)
+
+                results += rule_result + "\n"
+
+                with open(path + "rule_" + str(rule) + "_summary" + ".txt", 'w+') as f:
+                    temp_results = headline + rule_result
+                    f.write(temp_results)
+
+            output = headline + results
+            print(output)
+            print("total time used in seconds:" + str(time.time() - before_time))
+
+            with open(path + "..\\yilmaz_distractor_results_summary.txt", 'w+') as f:
+                f.write(output)
     def n_bit_task(self, n=5):
 
 
-        n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_5_dist_32")
+        n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_200_dist_32")
         random.shuffle(n_bit_data)
+
         rcca_problem = rcca.RCCAProblem(n_bit_data)
         rcca_config = rcca.RCCAConfig()
-        rcca_config.set_single_reservoir_config(ca_rule=110, R=4, C=1, I=32, classifier="linear-svm",
-                                                encoding="random_mapping", time_transition="normalized_addition")
+        rcca_config.set_single_reservoir_config(ca_rule=150, R=16, C=10, I=8, classifier="linear-svm",
+                                                        encoding="random_mapping",
+                                                        time_transition="random_permutation")
         #rcca_config.set_parallel_reservoir_config(ca_rules=[90,182], parallel_size_policy="bounded", R=64, C=1, I=16,
         #                              classifier="linear-svm", encoding="random_mapping",
         #                              time_transition="normalized_addition")
@@ -170,8 +392,11 @@ class Project:
         rcca_system.set_problem(rcca_problem)
         rcca_system.set_config(rcca_config)
         rcca_system.initialize_rc()
-        rcca_system.fit_to_problem(validation_set_size=0.1)
-        rcca_out = rcca_system.test_on_problem()
+        rcca_system.fit_to_problem(22/32)
+
+        #rcca_config.encoder.create_mappings(4)
+
+        rcca_out = rcca_system.test_on_problem(22/32)
         print(str(rcca_out.total_correct) + " of " + str(len(rcca_out.all_test_examples)))
         print("--example--")
         example_run = rcca_out.all_predictions[0]

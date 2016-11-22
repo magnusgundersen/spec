@@ -14,10 +14,20 @@ class SVM(interfaces.RCClassifier):
         #self.svm = neig.KNeighborsClassifier()
 
     def fit(self, training_input, correct_predictions):
-        #print("[SVM] " + str(training_input[:100]))
-        #print("[SVM] " + str(correct_predictions[:100]))
-        #print(training_input)
+        #print(str(len(training_input)))
+        for i in range(len(training_input)):
+            #print("FITTING: ")
+            #print(str(len(training_input[i])))
+            #print(training_input[i])
+            #print(correct_predictions[i])
+            #print("")
+            pass
         return self.svm.fit(training_input, correct_predictions)
 
     def predict(self, reservoir_outputs):
-        return self.svm.predict(reservoir_outputs)
+        #print("PREdicting:")
+        #print(reservoir_outputs)
+        predictions = self.svm.predict(reservoir_outputs)
+        #print(predictions)
+        #print("")
+        return predictions

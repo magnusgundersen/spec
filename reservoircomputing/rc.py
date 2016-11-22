@@ -116,6 +116,7 @@ class ReservoirComputingFramework:
         #print("Finished propagating")
         self.classifier.fit(reservoir_outputs,classifier_outputs)
         #print("Finished fitting the classifier")
+        self.rc_helper.training_finished()
 
 
 
@@ -209,8 +210,6 @@ class ReservoirComputingFramework:
 
 
     def train_classifier(self):
-        #print("Fitting classifier")
-
         self.classifier.fit(self.classifier_input_set, self.classifier_output_set)
 
     def predict(self, test_data):
@@ -238,21 +237,12 @@ class ReservoirComputingFramework:
         _outputs = []
         classifier_input_set = []
         self.rc_helper.reset()
-        number_of_correct = 0
         for _input, _output in test_data:  # input and output at each timestep
             rc_output = self.rc_helper.run_input(_input)
             classifier_input = rc_output.flattened_states
             classifier_prediction = self.classifier.predict(classifier_input)
             _outputs.append(classifier_prediction)
 
-
-            # HACK
-            #print("Correct class: " + str(_output))
-            #print("predicted cls: " + str(classifier_prediction))
-            #print("Correct: "+ str(_output) +"     Prediction"+ str(classifier_prediction))
-            if _output == classifier_prediction[0]:
-                number_of_correct += 1
-        #print("number: " + str(number_of_correct) + " of "+str(len(test_data)))
         return _outputs
 
 
@@ -278,18 +268,21 @@ class RCHelper:
         # Run input that is deptandant on previous inputs
         # 1. step is to consider if the reservoir landscape is parallelized
         # TODO: currently not implemented
-
+        #print("INPUT: " + str(_input))
         # 2. Step is to encode the input
         encoded_inputs = self.encoder.encode_input(_input)  # List of lists
         # 3. Step is to concat or keep the inputs by themselves
         # TODO: Remove this if you want to be able to have separate reservoirs!
         encoded_input = [val for sublist in encoded_inputs for val in sublist]
-
+        pre_enc = encoded_input[:]
         encoded_input, rule_dict = self.parallelizer.encode(encoded_input)
-
+        if pre_enc != encoded_input:
+            print("PARLLLALALLALALL")
         # 4. step is to use transition to take previous steps into account
         if self.time_step > 0:  # No transition at first time step
+
             transitioned_data = self.time_transition.join(encoded_input, self.last_step_data, self.encoder)
+            #print("Trans_data: " + str(transitioned_data))
         else:
             transitioned_data = encoded_input
 
@@ -307,6 +300,10 @@ class RCHelper:
         self.time_step += 1
 
         return output
+
+    def training_finished(self):
+        pass
+
 
 
 
@@ -332,7 +329,7 @@ class RCOutput:
     def set_states(self, all_states, transitioned_state):
         self.list_of_states = all_states
         self.transitioned_state = transitioned_state
-        self.flattened_states = [state_val for sublist in all_states for state_val in sublist]
+        self.flattened_states = [state_val for sublist in all_states[1:] for state_val in sublist]
 
 
 
