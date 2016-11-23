@@ -268,7 +268,7 @@ class Project:
                         (32, 35), (32, 40), (32, 45)
 
                      ]
-        total_runs_per_config = 64
+        total_runs_per_config = 16
 
         distractor_periods = [25,50,100,200]
         for distractor_period in distractor_periods:
