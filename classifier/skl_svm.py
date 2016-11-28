@@ -15,19 +15,24 @@ class SVM(interfaces.RCClassifier):
 
     def fit(self, training_input, correct_predictions):
         #print(str(len(training_input)))
-        for i in range(len(training_input)):
-            #print("FITTING: ")
-            #print(str(len(training_input[i])))
-            #print(training_input[i])
-            #print(correct_predictions[i])
-            #print("")
-            pass
+        #self.prev_seen = training_input
+
         return self.svm.fit(training_input, correct_predictions)
 
     def predict(self, reservoir_outputs):
+
+
         #print("PREdicting:")
         #print(reservoir_outputs)
         predictions = self.svm.predict(reservoir_outputs)
         #print(predictions)
         #print("")
+
+        if False: #eservoir_outputs in self.prev_seen:
+            chuncks = len(reservoir_outputs)//5
+            print(len(reservoir_outputs)/5)
+            print("seen before!" + str(predictions))
+            for i in range(5):
+                print(reservoir_outputs[i*chuncks:(i+1)*chuncks])
+            print("")
         return predictions

@@ -49,17 +49,16 @@ class Project:
 
     def run_bye_experiements(self):
         print("Running bye-experiments")
-        rules = [n for n in range(256)]
         rules = [60,90,102,105,150,153,165,180,195]  # Bye rules
         #rules = [182, 90]  # wuixcc
         Is_and_Rs = [(2,4),(2,8),(4,4),(4,8)]
-        total_runs_per_config = (8*8)
+        total_runs_per_config = (4*7)
 
-        n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_15_dist_32")
+        n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_200_dist_32")
         random.shuffle(n_bit_data)
 
         ## Save:
-        headline = "Rule\tI=2,R=4\t\tI=2,R=8\t\tI=4,R=4\t\tI=4,R=8\n"
+        headline = "Rule\t\tI=2,R=4\t\tI=2,R=8\t\tI=4,R=4\t\tI=4,R=8\n"
 
 
         results = ""
@@ -77,7 +76,7 @@ class Project:
 
                 successful_runs = 0
 
-                with Pool(8) as p:
+                with Pool(7) as p:
                     results_from_runs = p.starmap(run_exec,
                                                   [(n_bit_data,rule,
                                                     rcca_problem, rcca_config) for _ in range(total_runs_per_config)])
@@ -268,7 +267,15 @@ class Project:
                         (32, 35), (32, 40), (32, 45)
 
                      ]
-        total_runs_per_config = 16
+        Is_and_Rs = [
+            (4, 2), (4, 3), (4, 4), (4, 5),
+            (4, 6), (4, 7), (4, 8), (4, 9),
+            (4, 10),
+            (8, 2), (8, 3), (8, 4), (8, 5),
+            (8, 6), (8, 7), (8, 8), (8, 9),
+            (8, 10)
+        ]
+        total_runs_per_config = 32
 
         distractor_periods = [25,50,100,200]
         for distractor_period in distractor_periods:
@@ -293,9 +300,9 @@ class Project:
                 for I, R in Is_and_Rs:
                     rcca_problem = rcca.RCCAProblem(n_bit_data)
                     rcca_config = rcca.RCCAConfig()
-                    rcca_config.set_single_reservoir_config(ca_rule=rule, R=R, C=1, I=I, classifier="linear-svm",
-                                                            encoding="random_mapping",
-                                                            time_transition="normalized_addition")
+                    rcca_config.set_single_reservoir_config(ca_rule=90, R=4, C=10, I=4, classifier="linear-svm",
+                                                        encoding="random_mapping",
+                                                        time_transition="random_permutation")
 
                     successful_runs = 0
 
@@ -372,12 +379,10 @@ class Project:
     def n_bit_task(self, n=5):
 
 
-        n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_200_dist_32")
-        random.shuffle(n_bit_data)
-
+        n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_100_dist_32")
         rcca_problem = rcca.RCCAProblem(n_bit_data)
         rcca_config = rcca.RCCAConfig()
-        rcca_config.set_single_reservoir_config(ca_rule=150, R=16, C=10, I=8, classifier="linear-svm",
+        rcca_config.set_single_reservoir_config(ca_rule=60, R=4, C=10, I=4, classifier="linear-svm",
                                                         encoding="random_mapping",
                                                         time_transition="random_permutation")
         #rcca_config.set_parallel_reservoir_config(ca_rules=[90,182], parallel_size_policy="bounded", R=64, C=1, I=16,
@@ -456,6 +461,109 @@ class Project:
 
         :return:
         """
+        print("Running mg-experiments")
+        rules = [60, 90, 102, 105, 150, 153, 165, 180, 195]  # Bye rules
+        all_rules = [comb for comb in itertools.combinations(rules, 2)]
+
+        # rules = [182, 90]  # wuixcc
+        Is_and_Rs = [(2, 4), (2, 8), (4, 4), (4, 8)]
+        total_runs_per_config = (8 * 4)
+
+        n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_200_dist_32")
+        random.shuffle(n_bit_data)
+
+        ## Save:
+        headline = "Rule"
+        for I, R in Is_and_Rs:
+            headline += "\tI=" + str(I) + ",R=" + str(R)
+        headline += "\n"
+        results = ""
+        before_time = time.time()
+        for rule_1, rule_2 in all_rules:
+            rule_string = str(rule_1) + "_" +str(rule_2)
+            print("Executing rule: " + rule_string)
+
+            rule_results = []
+
+            for I, R in Is_and_Rs:
+                rcca_problem = rcca.RCCAProblem(n_bit_data)
+                rcca_config = rcca.RCCAConfig()
+                rcca_config.set_parallel_reservoir_config(ca_rules=[rule_1,rule_2], parallel_size_policy="bounded", R=R, C=10, I=I,
+                                      classifier="linear-svm", encoding="random_mapping",
+                                      time_transition="random_permutation")
+
+
+                successful_runs = 0
+
+                with Pool(8) as p:
+                    results_from_runs = p.starmap(run_exec,
+                                                  [("", "",
+                                                    rcca_problem, rcca_config) for _ in range(total_runs_per_config)])
+
+                csv_name = "rule_" + rule_string + "_I" + str(I) + "R" + str(R)
+                path = os.getcwd()
+                path = path + r"\..\data\experiments_data\rule_" + rule_string+ "\\"  # raw string
+
+                # Rule directory
+                try:
+                    os.makedirs(path)
+                except OSError as exception:
+                    pass
+
+                save_pickle = False
+                # Pickles dir
+                if save_pickle:
+                    try:
+                        os.makedirs(path + r"pickles\\")
+                    except OSError as exception:
+                        pass
+
+                # Dump pickles ++
+                i = 0
+                for run in results_from_runs:
+                    # save pickle
+                    if save_pickle:
+                        with open(path + "pickles\\run_" + str(i) + ".pkl", 'wb') as output:
+                            pickle.dump(run.all_predictions, output, pickle.HIGHEST_PROTOCOL)
+                    if run.was_successful():
+                        successful_runs += 1
+                    i += 1
+
+                # csv
+                with open(path + csv_name + ".csv", 'w+', newline='') as f:
+                    writer = csv.writer(f, dialect='excel')
+                    for run in results_from_runs:
+                        writer.writerow([rule_string, run.total_correct, len(run.all_test_examples)])
+
+                # print("successful: " + str(successful_runs) + " of " + str(len(results_from_runs)))
+                percentage_success = (successful_runs / total_runs_per_config) * 100
+                percentage_success = round(percentage_success, 1)  # 43.6
+                rule_results.append(percentage_success)
+
+            if results == "":
+                one_rule = (time.time() - before_time)
+                no_of_rules = len(rules)
+                total_time_estimated = no_of_rules * one_rule
+                print("Total estimated_time: " + str(int(total_time_estimated)) + " seconds")
+                print("In minutes: " + str(total_time_estimated // 60))
+                print("In hours: " + str(total_time_estimated // 3600))
+
+            rule_result = rule_string
+            for result in rule_results:
+                rule_result += "\t\t" + str(result)
+
+            results += rule_result + "\n"
+
+            with open(path + "rule_" + rule_string + "_summary" + ".txt", 'w+') as f:
+                temp_results = headline + rule_result
+                f.write(temp_results)
+
+        output = headline + results
+        print(output)
+        print("total time used in seconds:" + str(time.time() - before_time))
+
+        with open(path + "..\\mg_results_summary.txt", 'w+') as f:
+            f.write(output)
 
     def visualise_example(self, training_array):
         visualizer = bviz.CAVisualizer()

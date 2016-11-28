@@ -14,6 +14,8 @@ from encoder import rnd_mapping as rnd_map
 from encoder import parallel as prl
 from time_transition_encoder import normalized_addition as norm_add
 from time_transition_encoder import random_permutation as rnd_perm
+from time_transition_encoder import xor as xor
+import random
 
 global t
 t=16 # FOR TRAINING SET SPLITTING! REMOVE
@@ -239,6 +241,7 @@ class RCCAProblem:
         self.number_of_time_steps = len(example_data[0])
 
         self.training_data = example_data
+        random.shuffle(self.training_data)
 
         if self.number_of_time_steps > 1:
             self.is_temporal = True
@@ -291,6 +294,8 @@ class RCCAConfig(rc_if.ExternalRCConfig):
             self.time_transition = norm_add.RandomAdditionTimeTransition()
         elif time_transition == "random_permutation":
             self.time_transition = rnd_perm.RandomPermutationTransition()
+        elif time_transition == "xor":
+            self.time_transition = xor.XORTimeTransition()
 
     def set_parallel_reservoir_config(self, ca_rules=(105,110), parallel_size_policy="unbounded", R=4, C=3, I=12,
                                       classifier="linear-svm", encoding="random_mapping",
