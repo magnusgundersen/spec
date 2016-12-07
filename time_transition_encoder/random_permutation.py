@@ -7,18 +7,17 @@ class RandomPermutationTransition:
         # ONLY DIFF FROM BELOW IS THAT THIS VERSION TAKES IN A LIST OF LISTS
         joined = []
         for i in range(len(_input)):
-            joined.append(self.join(_input[i], _transition_input[i], encoder))
+            joined.append(self.join(_input[i], _transition_input[i], encoder, selected_interval=(i,i+1)))
         return joined
 
-    def join(self, _input, _transition_input, encoder, selected_interval =(0,0)):
+    def join(self, _input, _transition_input, encoder, selected_interval =()):
 
         size = len(_transition_input)
 
         if selected_interval == ():
             mappings = encoder.mappings
         else:
-            mappings = encoder.mappings[0:1]
-        print(mappings)
+            mappings = encoder.mappings[selected_interval[0]:selected_interval[1]]  # ONLY FIRST MAPPING
         R = encoder.R
         P = encoder.P
 

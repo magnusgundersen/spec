@@ -279,8 +279,6 @@ class RCHelper:
 
         # 4. step is to use transition to take previous steps into account
         if self.time_step > 0:  # No transition at first time step
-            print("Encoded: " + str(encoded_input))
-            print("Last stp:" + str(self.last_step_data))
             transitioned_data = self.time_transition.sep_join(encoded_input, self.last_step_data, self.encoder)
         else:
             transitioned_data = encoded_input
@@ -335,13 +333,15 @@ class RCOutput:
 
     def set_sep_states(self, all_states, transitioned_state):
         cat_states = []
-
-        print(all_states)
-        self.list_of_states = [[all_states[j][i] for j in range(len(all_states[i]))] for i in range(len(all_states))]
-        print(self.list_of_states)
+        for j in range(len(all_states[0])):
+            cat_one_states = []
+            for i in range(len(all_states)):
+                cat_one_states.extend(all_states[i][j])
+            cat_states.append(cat_one_states)
+        self.list_of_states = cat_states
 
         self.transitioned_state = transitioned_state
-        self.flattened_states = [state_val for sublist in all_states for state_val in sublist]
+        self.flattened_states = [state_val for sublist in cat_states for state_val in sublist]
 
 
 
