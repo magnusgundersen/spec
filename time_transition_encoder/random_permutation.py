@@ -2,12 +2,23 @@ class RandomPermutationTransition:
     def __init__(self):
         pass
 
-    def join(self, _input, _transition_input, encoder):
+
+    def sep_join(self, _input, _transition_input, encoder):
+        # ONLY DIFF FROM BELOW IS THAT THIS VERSION TAKES IN A LIST OF LISTS
+        joined = []
+        for i in range(len(_input)):
+            joined.append(self.join(_input[i], _transition_input[i], encoder))
+        return joined
+
+    def join(self, _input, _transition_input, encoder, selected_interval =(0,0)):
 
         size = len(_transition_input)
 
-
-        mappings = encoder.mappings
+        if selected_interval == ():
+            mappings = encoder.mappings
+        else:
+            mappings = encoder.mappings[0:1]
+        print(mappings)
         R = encoder.R
         P = encoder.P
 

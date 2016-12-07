@@ -273,27 +273,31 @@ class RCHelper:
         encoded_inputs = self.encoder.encode_input(_input)  # List of lists
         # 3. Step is to concat or keep the inputs by themselves
         # TODO: Remove this if you want to be able to have separate reservoirs!
-        encoded_input = [val for sublist in encoded_inputs for val in sublist]
+        encoded_input = encoded_inputs #  [val for sublist in encoded_inputs for val in sublist]
         pre_enc = encoded_input[:]
         encoded_input, rule_dict = self.parallelizer.encode(encoded_input)
-        if pre_enc != encoded_input:
-            print("PARLLLALALLALALL")
+
         # 4. step is to use transition to take previous steps into account
         if self.time_step > 0:  # No transition at first time step
-            transitioned_data = self.time_transition.join(encoded_input, self.last_step_data, self.encoder)
+            print("Encoded: " + str(encoded_input))
+            print("Last stp:" + str(self.last_step_data))
+            transitioned_data = self.time_transition.sep_join(encoded_input, self.last_step_data, self.encoder)
         else:
             transitioned_data = encoded_input
 
-          # ajour
+        # ajour
 
         # 5. step is to propagate in CA reservoir
-        all_propagated_data = self.reservoir.run_simulation(transitioned_data, self.I,  rule_dict)
+        all_propagated_datas = []
+        for enc_input in transitioned_data:
+            all_propagated_datas.append(self.reservoir.run_simulation(enc_input, self.I,  rule_dict))
         previous_data = self.last_step_data[:]
-        self.last_step_data = all_propagated_data[-1]
+        self.last_step_data = [all_propagated_data[-1] for all_propagated_data in all_propagated_datas]
+
 
         # 6. step is to create an output-object
         output = RCOutput()
-        output.set_states(all_propagated_data, previous_data)
+        output.set_sep_states(all_propagated_datas, previous_data)
 
         self.time_step += 1
 
@@ -326,6 +330,16 @@ class RCOutput:
 
     def set_states(self, all_states, transitioned_state):
         self.list_of_states = all_states
+        self.transitioned_state = transitioned_state
+        self.flattened_states = [state_val for sublist in all_states for state_val in sublist]
+
+    def set_sep_states(self, all_states, transitioned_state):
+        cat_states = []
+
+        print(all_states)
+        self.list_of_states = [[all_states[j][i] for j in range(len(all_states[i]))] for i in range(len(all_states))]
+        print(self.list_of_states)
+
         self.transitioned_state = transitioned_state
         self.flattened_states = [state_val for sublist in all_states for state_val in sublist]
 

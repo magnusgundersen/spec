@@ -25,11 +25,11 @@ def main():
 
 
     #print(p.majority_task())
-    #print(p.n_bit_task())
+    print(p.n_bit_task())
     #print(p.run_bye_experiements())
     #print(p.run_yil_experiment_IR())
     #print(p.run_yil_experiment_RNN_distractor())
-    print(p.run_mg_experiments())
+    #print(p.run_mg_experiments())
 
 
 if __name__ == "__main__":

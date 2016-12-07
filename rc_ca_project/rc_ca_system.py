@@ -274,7 +274,8 @@ class RCCAConfig(rc_if.ExternalRCConfig):
         ca_rule = [ca_rule]  # Parallel?
         self.reservoir.set_rules(ca_rule)
 
-        self.parallelizer = prl.ParallelNonUniformEncoder(self.reservoir.rules, "unbounded")
+        # BELOW IS HACK FOR SEPARATE RESERVOIRS
+        self.parallelizer = prl.ParallelNonUniformEncoder(self.reservoir.rules, "unbounded_separate")
 
         # clf
         if classifier=="linear-svm":

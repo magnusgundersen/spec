@@ -26,6 +26,12 @@ class ParallelNonUniformEncoder:  # Consider renaming/rebranding to a "rule-gove
                 rule_dict[(i*pieces, ((i+1)*pieces)-1)] = self.ca_rules[i]
                 # TODO: MAJOR PROBLEM if its an odd number of cells
 
+        # testing this out, for separate reservoirs
+        elif self.parallel_size_policy == "unbounded_separate":
+            new_input = _input
+            rule_dict = {(0, len(_input[0])): self.ca_rules[0]}  # ONLY ONE RULE ALLOWED
+
+
 
         return new_input, rule_dict
 

@@ -382,7 +382,7 @@ class Project:
         n_bit_data = self.open_temporal_data("temp_n_bit/5_bit_100_dist_32")
         rcca_problem = rcca.RCCAProblem(n_bit_data)
         rcca_config = rcca.RCCAConfig()
-        rcca_config.set_single_reservoir_config(ca_rule=60, R=4, C=10, I=4, classifier="linear-svm",
+        rcca_config.set_single_reservoir_config(ca_rule=60, R=2, C=2, I=4, classifier="linear-svm",
                                                         encoding="random_mapping",
                                                         time_transition="random_permutation")
         #rcca_config.set_parallel_reservoir_config(ca_rules=[90,182], parallel_size_policy="bounded", R=64, C=1, I=16,
