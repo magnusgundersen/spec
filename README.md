@@ -1,9 +1,19 @@
-Repo for specialization project H2016
+### NOTE: 
+Please see the following repository for a more up-to-date ReCA implementation:
+[https:github.com/magnusgundersen/master-thesis](https:github.com/magnusgundersen/master-thesis).
 
 
-<b>Requirements:</b>
-<ul>
-<li>Python 3.5</li>
-<li>Scipy</li>
-<li>Scikit-learn</li>
-</ul>
+# ReCA: Reservoir computing using Cellular Automata
+
+This repository contains the code for the experiments in the paper **Reservoir Computing Using Non-Uniform Cellular Automata**
+
+
+[https://arxiv.org/abs/1702.03812](https://arxiv.org/abs/1702.03812)
+
+
+
+**Requirements:**
+* Python 3.5 
+* Scipy
+* Scikit-learn
+
