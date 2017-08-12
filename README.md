@@ -1,6 +1,6 @@
 ### NOTE: 
 Please see the following repository for a more up-to-date ReCA implementation:
-[https:github.com/magnusgundersen/master-thesis](https:github.com/magnusgundersen/master-thesis).
+[https://github.com/magnusgundersen/master-thesis](https://github.com/magnusgundersen/master-thesis).
 
 
 # ReCA: Reservoir computing using Cellular Automata
